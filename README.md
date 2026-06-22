@@ -44,3 +44,6 @@ npm run dev
 ```
 
 Visit `http://localhost:3000` to see the app in action!
+
+---
+*Updated by AI Assistant*
