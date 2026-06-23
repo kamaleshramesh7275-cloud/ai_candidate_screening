@@ -5,6 +5,7 @@ import questionsDb from '../questions.json';
 export const generateTest = async (req: Request, res: Response) => {
   try {
     const { domain } = req.params;
+    const { candidateId } = req.query;
     
     const allQuestions = (questionsDb as Record<string, any[]>)[domain as string] || (questionsDb as Record<string, any[]>)['General CS'];
     
@@ -17,6 +18,14 @@ export const generateTest = async (req: Request, res: Response) => {
 
     // Randomize order
     testQuestions.sort(() => Math.random() - 0.5);
+
+    // If candidateId is provided, record the start time in DB
+    if (candidateId) {
+      await prisma.candidate.update({
+        where: { id: candidateId as string },
+        data: { testStartTime: new Date() }
+      }).catch(err => console.error('Error updating candidate testStartTime:', err));
+    }
 
     res.status(200).json({ questions: testQuestions });
   } catch (error) {
@@ -44,6 +53,28 @@ export const submitTest = async (req: Request, res: Response) => {
     const domain = candidate.domain || 'General CS';
     const allQuestions = (questionsDb as Record<string, any[]>)[domain as string] || (questionsDb as Record<string, any[]>)['General CS'];
     
+    // Server-side test duration validation
+    let timerFlagged = false;
+    let finalCheatStrikes = cheatStrikes;
+    const updatedCheatLog = [...(cheatLog || [])];
+
+    if (candidate.testStartTime) {
+      const startTime = new Date(candidate.testStartTime).getTime();
+      const elapsedSeconds = (Date.now() - startTime) / 1000;
+      // Allow 60 seconds per question + a generous 60-second overall buffer for network latency/loading
+      const maxAllowedSeconds = (allQuestions.length * 60) + 60;
+
+      if (elapsedSeconds > maxAllowedSeconds) {
+        timerFlagged = true;
+        finalCheatStrikes = Math.min(3, finalCheatStrikes + 2); // Add heavy strikes for time manipulation
+        updatedCheatLog.push({
+          type: 'Server-side Time Limit Exceeded',
+          timestamp: new Date().toISOString(),
+          details: `Elapsed: ${Math.round(elapsedSeconds)}s, Max Allowed: ${maxAllowedSeconds}s`
+        });
+      }
+    }
+
     let correctCount = 0;
     
     // Score answers
@@ -56,7 +87,7 @@ export const submitTest = async (req: Request, res: Response) => {
 
     // Calculate Test Score: (correct / total * 100) - (strikes * 5)
     let testScore = (correctCount / allQuestions.length) * 100;
-    testScore -= (cheatStrikes * 5);
+    testScore -= (finalCheatStrikes * 5);
     testScore = Math.max(testScore, 0); // floor at 0
 
     // Weighted average (Resume 25% + GitHub 25% + Test 50%)
@@ -67,14 +98,14 @@ export const submitTest = async (req: Request, res: Response) => {
       data: {
         testCompleted: true,
         testScore,
-        cheatStrikes,
-        cheatLog: JSON.stringify(cheatLog),
+        cheatStrikes: finalCheatStrikes,
+        cheatLog: JSON.stringify(updatedCheatLog),
         overallScore,
         status: 'Tested'
       }
     });
 
-    res.status(200).json({ message: 'Test submitted successfully', testScore, overallScore });
+    res.status(200).json({ message: 'Test submitted successfully', testScore, overallScore, timerFlagged });
   } catch (error) {
     console.error('Error submitting test:', error);
     res.status(500).json({ error: 'Internal server error.' });

@@ -27,6 +27,7 @@ model Candidate {
   // Phase 2 Test Data
   testCompleted   Boolean  @default(false)
   testScore       Float?
+  testStartTime   DateTime?
   cheatStrikes    Int      @default(0)
   cheatLog        String?  // Storing JSON as string
   
