@@ -1,0 +1,10 @@
+# Redrob Hackathon - Candidate Ranker
+# No external dependencies required — uses only Python standard library
+
+# Standard library only (no pip installs needed):
+# - json
+# - csv
+# - argparse
+# - datetime
+# - pathlib
+# - sys

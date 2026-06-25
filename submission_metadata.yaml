@@ -1,0 +1,77 @@
+# Redrob Hackathon — Submission Metadata
+
+team_name: "ai-candidate-screening"
+
+primary_contact:
+  name: "Kamalesh Ramesh"
+  email: "kamaleshramesh7275@gmail.com"
+  phone: "+91-XXXXXXXXXX"
+
+team_members:
+  - name: "Kamalesh Ramesh"
+    email: "kamaleshramesh7275@gmail.com"
+    role: "Team Lead / ML Engineer"
+
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/kamaleshramesh7275/ai_candidate_screening"
+
+sandbox_link: "https://huggingface.co/spaces/kamaleshramesh7275/redrob-ranker"
+
+reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
+
+# ============================================================================
+# Compute environment
+# ============================================================================
+compute:
+  platform: "Windows PC"
+  cpu_cores: 8
+  ram_gb: 16
+  python_version: "3.14"
+  os: "Windows 11"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+
+# ============================================================================
+# AI tools declaration
+# ============================================================================
+ai_tools_used:
+  - "Gemini"
+
+ai_usage_summary: |
+  Used Gemini (Antigravity IDE) for architecture discussion, code review, and
+  assistance with Python development. All candidate data processing logic was
+  designed and verified by the human engineer. No candidate data was sent to
+  any external LLM during the ranking step.
+
+# ============================================================================
+# Approach summary
+# ============================================================================
+methodology_summary: |
+  Rule-based multi-signal ranker with five weighted components:
+  (1) Skills match (30%): must-have retrieval/embedding/vector-DB keywords
+  weighted by proficiency level and duration of use, with assessment score
+  bonuses. (2) Career evidence (35%): keyword hits across job descriptions for
+  search/retrieval/ranking/recommendation, product-company fraction, and title
+  alignment. Entire consulting backgrounds penalized 0.5x. (3) Experience years
+  (15%): 5-9 year target band peaks at 6-8 years. (4) Location (10%): Noida/
+  Pune preferred per JD, graded by city proximity to office. (5) Behavioral
+  signals (10%): recency, open-to-work flag, recruiter response rate, notice
+  period, interview completion rate, GitHub activity. Honeypot detection
+  filters ~127 candidates with impossible job durations (calculated vs stated
+  duration_months > 4 months), excessive expert skills with 0 duration, and
+  chronological impossibilities. Runtime: ~3 seconds for 100K candidates
+  on CPU. Zero external API calls.
+
+# ============================================================================
+# Declarations
+# ============================================================================
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true
