@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Candidate {
+  id              String   @id @default(uuid())
+  name            String
+  email           String   @unique
+  password        String?
+  linkedInUrl     String?
+  githubUrl       String?
+  resumeText      String?
+  domain          String?
+  
+  // Phase 1 Scores & Verification
+  resumeScore     Float?
+  githubScore     Float?
+  linkedInScore   Float?
+  skillsMatchLog  String?  // Storing JSON as string
+  githubRawData   String?  // Storing JSON as string
+  linkedInRawData String?  // Storing JSON as string
+  
+  // Phase 2 Test Data
+  testCompleted   Boolean  @default(false)
+  testScore       Float?
+  cheatStrikes    Int      @default(0)
+  cheatLog        String?  // Storing JSON as string
+  
+  // Recruiter Notes
+  recruiterNotes  String?
+  
+  // Overall Status
+  overallScore    Float?
+  status          String   @default("Applied") // Applied, Tested, Shortlisted, Rejected
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Recruiter {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Hashed
+  name      String
+}
