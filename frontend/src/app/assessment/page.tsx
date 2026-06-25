@@ -158,9 +158,9 @@ function AssessmentEngine() {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+    <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
       <div className="animate-pulse text-white flex flex-col items-center">
-        <Loader2 className="w-12 h-12 text-slate-500 mb-4 animate-spin" />
+        <Loader2 className="w-12 h-12 text-zinc-500 mb-4 animate-spin" />
         <p>Loading Assessment Environment...</p>
       </div>
     </div>
@@ -168,12 +168,12 @@ function AssessmentEngine() {
 
   if (!started) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
-        <div className="absolute top-4 right-4">
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-4 pt-20">
+        <div className="absolute top-4 right-4 z-50">
           <ThemeToggle />
         </div>
-        <Card className="w-full max-w-2xl bg-slate-900 border-slate-800 shadow-2xl">
-          <CardHeader className="text-center pb-8 border-b border-slate-800">
+        <Card className="w-full max-w-2xl bg-zinc-900 border-zinc-800 shadow-2xl">
+          <CardHeader className="text-center pb-8 border-b border-zinc-800">
             <div className="mx-auto bg-red-500/10 w-16 h-16 rounded-full flex items-center justify-center mb-4">
               <ShieldAlert className="w-8 h-8 text-red-500" />
             </div>
@@ -183,27 +183,27 @@ function AssessmentEngine() {
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-300">
-              <div className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-zinc-300">
+              <div className="flex items-start gap-3 p-4 bg-zinc-800/50 rounded-lg">
                 <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
                 <p className="text-sm">Do not switch tabs or minimize the browser window.</p>
               </div>
-              <div className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-lg">
+              <div className="flex items-start gap-3 p-4 bg-zinc-800/50 rounded-lg">
                 <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
                 <p className="text-sm">Copying and pasting text is strictly prohibited.</p>
               </div>
-              <div className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-lg">
+              <div className="flex items-start gap-3 p-4 bg-zinc-800/50 rounded-lg">
                 <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
                 <p className="text-sm">Do not open developer tools or exit fullscreen.</p>
               </div>
-              <div className="flex items-start gap-3 p-4 bg-slate-800/50 rounded-lg">
+              <div className="flex items-start gap-3 p-4 bg-zinc-800/50 rounded-lg">
                 <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                 <p className="text-sm font-semibold">3 strikes will result in automatic test failure.</p>
               </div>
             </div>
           </CardContent>
-          <CardFooter className="bg-slate-950/50 pt-6 rounded-b-xl border-t border-slate-800">
-            <Button onClick={startTest} size="lg" className="w-full bg-blue-600 hover:bg-blue-500 text-lg py-6 shadow-[0_0_20px_-5px_rgba(37,99,235,0.5)]">
+          <CardFooter className="bg-zinc-950/50 pt-6 rounded-b-xl border-t border-zinc-800">
+            <Button onClick={startTest} size="lg" className="w-full bg-red-600 hover:bg-red-500 text-lg py-6 shadow-[0_0_20px_-5px_rgba(37,99,235,0.5)]">
               I Understand &mdash; Enter Fullscreen
             </Button>
           </CardFooter>
@@ -216,35 +216,35 @@ function AssessmentEngine() {
 
   if (!currentQ) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">
+      <div className="min-h-screen bg-zinc-900 flex items-center justify-center text-white">
         <p>No questions generated for domain: {domain}. Please contact recruitment.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center pt-16 p-4 transition-colors duration-200">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center pt-20 p-4 transition-colors duration-200">
+      <div className="absolute top-4 right-4 z-50">
         <ThemeToggle />
       </div>
 
       {/* Top HUD */}
-      <div className="w-full max-w-4xl flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+      <div className="w-full max-w-4xl flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 bg-white dark:bg-zinc-900 p-4 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-4">
-          <div className="text-sm font-bold text-slate-400 uppercase tracking-wider">Progress</div>
-          <div className="bg-slate-100 dark:bg-slate-800 h-2 w-32 md:w-48 rounded-full overflow-hidden">
+          <div className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Progress</div>
+          <div className="bg-zinc-100 dark:bg-zinc-800 h-2 w-32 md:w-48 rounded-full overflow-hidden">
             <div 
-              className="bg-blue-600 h-full transition-all duration-500 ease-out" 
+              className="bg-red-600 h-full transition-all duration-500 ease-out" 
               style={{ width: `${((currentQuestionIndex) / questions.length) * 100}%` }}
             ></div>
           </div>
-          <div className="text-slate-600 dark:text-slate-350 font-medium">{currentQuestionIndex + 1} / {questions.length}</div>
+          <div className="text-zinc-600 dark:text-zinc-400 font-medium">{currentQuestionIndex + 1} / {questions.length}</div>
         </div>
         
         <div className="flex gap-6 items-center">
           <div className="flex items-center gap-2">
-            <Clock className={`w-5 h-5 ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-slate-400'}`} />
-            <span className={`text-xl font-mono font-bold ${timeLeft <= 10 ? 'text-red-600 dark:text-red-400' : 'text-slate-700 dark:text-slate-300'}`}>
+            <Clock className={`w-5 h-5 ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-zinc-400'}`} />
+            <span className={`text-xl font-mono font-bold ${timeLeft <= 10 ? 'text-red-600 dark:text-red-400' : 'text-zinc-700 dark:text-zinc-300'}`}>
               00:{timeLeft.toString().padStart(2, '0')}
             </span>
           </div>
@@ -257,37 +257,37 @@ function AssessmentEngine() {
       
       {/* Question Card */}
       <div className="w-full max-w-4xl">
-        <Card className="border-0 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden bg-white dark:bg-slate-900">
-          <CardHeader className="bg-white dark:bg-slate-900 p-8 md:p-12 pb-6 border-b border-slate-100 dark:border-slate-800">
-            <CardTitle className="text-2xl md:text-3xl font-medium text-slate-800 dark:text-slate-100 leading-tight">
+        <Card className="border-0 shadow-xl shadow-zinc-200/50 dark:shadow-none overflow-hidden bg-white dark:bg-zinc-900">
+          <CardHeader className="bg-white dark:bg-zinc-900 p-8 md:p-12 pb-6 border-b border-zinc-100 dark:border-zinc-800">
+            <CardTitle className="text-2xl md:text-3xl font-medium text-zinc-800 dark:text-zinc-100 leading-tight">
               {currentQ.question}
             </CardTitle>
           </CardHeader>
-          <CardContent className="bg-slate-50/50 dark:bg-slate-850/50 p-8 md:p-12 space-y-4">
+          <CardContent className="bg-zinc-50/50 dark:bg-zinc-800/50 p-8 md:p-12 space-y-4">
             {currentQ.options.map((option: string) => (
               <div 
                 key={option}
                 onClick={() => setAnswers({...answers, [currentQ.id]: option})}
                 className={`p-5 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${
                   answers[currentQ.id] === option 
-                    ? 'border-blue-600 dark:border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 shadow-sm' 
-                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-355 hover:shadow-md dark:hover:border-blue-800'
+                    ? 'border-red-600 dark:border-red-500 bg-red-50 dark:bg-red-950/30 text-red-900 dark:text-red-100 shadow-sm' 
+                    : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-red-400 hover:shadow-md dark:hover:border-red-800'
                 }`}
               >
-                <span className={`text-lg ${answers[currentQ.id] === option ? 'font-semibold' : 'text-slate-700 dark:text-slate-300'}`}>
+                <span className={`text-lg ${answers[currentQ.id] === option ? 'font-semibold' : 'text-zinc-700 dark:text-zinc-300'}`}>
                   {option}
                 </span>
                 {answers[currentQ.id] === option && (
-                  <CheckCircle2 className="w-6 h-6 text-blue-600 dark:text-blue-400 animate-in zoom-in duration-200" />
+                  <CheckCircle2 className="w-6 h-6 text-red-600 dark:text-red-400 animate-in zoom-in duration-200" />
                 )}
               </div>
             ))}
           </CardContent>
-          <CardFooter className="bg-white dark:bg-slate-900 p-8 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+          <CardFooter className="bg-white dark:bg-zinc-900 p-8 border-t border-zinc-100 dark:border-zinc-800 flex justify-end">
             <Button 
               onClick={handleNext} 
               size="lg" 
-              className="px-10 h-14 text-lg bg-slate-900 dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-slate-200 hover:bg-slate-800 rounded-xl"
+              className="px-10 h-14 text-lg bg-zinc-900 dark:bg-zinc-100 dark:text-zinc-950 dark:hover:bg-zinc-200 hover:bg-zinc-800 rounded-xl"
               disabled={!answers[currentQ.id]}
             >
               {currentQuestionIndex === questions.length - 1 ? 'Submit Assessment' : 'Next Question'}
@@ -302,8 +302,8 @@ function AssessmentEngine() {
 export default function AssessmentPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-slate-500 animate-spin" />
+      <div className="min-h-screen bg-zinc-900 flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-zinc-500 animate-spin" />
       </div>
     }>
       <AssessmentEngine />

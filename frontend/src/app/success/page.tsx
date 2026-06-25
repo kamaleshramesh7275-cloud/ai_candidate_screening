@@ -9,8 +9,8 @@ export default function SuccessPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center text-center p-8 transition-colors duration-200">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center text-center p-8 pt-20 transition-colors duration-200">
+      <div className="absolute top-4 right-4 z-50">
         <ThemeToggle />
       </div>
 
@@ -18,14 +18,14 @@ export default function SuccessPage() {
         <ShieldCheck className="w-16 h-16" />
       </div>
 
-      <h1 className="text-4xl font-extrabold mb-4 text-slate-800 dark:text-slate-100">Test Submitted Successfully!</h1>
-      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8 max-w-xl leading-relaxed">
+      <h1 className="text-4xl font-extrabold mb-4 text-zinc-800 dark:text-zinc-100">Test Submitted Successfully!</h1>
+      <p className="text-lg text-zinc-500 dark:text-zinc-400 mb-8 max-w-xl leading-relaxed">
         Thank you for completing the technical assessment. Our automated system is now evaluating your results. We will be in touch soon.
       </p>
       <Button 
         onClick={() => router.push('/')} 
         size="lg" 
-        className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-200 dark:shadow-none px-8"
+        className="bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg shadow-red-200 dark:shadow-none px-8"
       >
         Return Home
       </Button>
