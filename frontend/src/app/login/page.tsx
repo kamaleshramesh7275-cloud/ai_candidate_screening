@@ -10,6 +10,7 @@ import {
   Mail, Lock, User, Eye, EyeOff, Sun, Moon, 
   Loader2, ArrowRight, ShieldCheck, Sparkles, Cpu, CheckCircle2 
 } from 'lucide-react';
+import { API_BASE } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -116,8 +117,8 @@ export default function LoginPage() {
 
     setLoading(true);
     const endpoint = isRegister
-      ? `http://localhost:3001/api/auth/${activeTab}/register`
-      : `http://localhost:3001/api/auth/${activeTab}/login`;
+      ? `${API_BASE}/api/auth/${activeTab}/register`
+      : `${API_BASE}/api/auth/${activeTab}/login`;
 
     const bodyData = isRegister
       ? { name, email, password }

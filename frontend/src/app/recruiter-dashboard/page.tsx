@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_BASE } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -104,7 +105,7 @@ export default function RecruiterDashboard() {
 
   const fetchCandidates = useCallback(async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/recruiter/candidates');
+      const res = await fetch(`${API_BASE}/api/recruiter/candidates`);
       const data = await res.json();
       const fetchedCandidates = data.candidates || [];
       setCandidates(fetchedCandidates);
@@ -126,7 +127,7 @@ export default function RecruiterDashboard() {
 
   const updateStatus = async (id: string, status: string) => {
     try {
-      await fetch(`http://localhost:3001/api/recruiter/candidates/${id}/status`, {
+      await fetch(`${API_BASE}/api/recruiter/candidates/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
@@ -140,7 +141,7 @@ export default function RecruiterDashboard() {
   const saveCandidateNotes = async (id: string) => {
     setSavingNotes(prev => ({ ...prev, [id]: true }));
     try {
-      await fetch(`http://localhost:3001/api/recruiter/candidates/${id}/notes`, {
+      await fetch(`${API_BASE}/api/recruiter/candidates/${id}/notes`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notes: notes[id] ?? '' })

@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Activity, Github, Linkedin, StickyNote, CheckCircle2, TrendingUp } from 'lucide-react';
+import { API_BASE } from '@/lib/api';
 
 const DOMAIN_KEYWORDS: Record<string, string[]> = {
   Frontend: ['React', 'Next.js', 'JavaScript', 'TypeScript', 'CSS', 'HTML', 'Tailwind', 'Redux', 'Vue', 'Angular', 'Webpack', 'GraphQL', 'REST', 'npm', 'Vite'],
@@ -61,7 +62,7 @@ export function CandidateDialog({ candidate, isOpen, onClose, onNotesSaved }: Ca
     setSavingNotes(true);
     try {
       const token = localStorage.getItem('recruiter_token');
-      await fetch(`http://localhost:3001/api/recruiter/candidates/${candidate.id}/notes`, {
+      await fetch(`${API_BASE}/api/recruiter/candidates/${candidate.id}/notes`, {
         method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',

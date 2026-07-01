@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { API_BASE } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,7 +46,7 @@ export default function RecruiterPage() {
     setLoginLoading(true);
     setLoginError('');
     try {
-      const res = await fetch('http://localhost:3001/api/recruiter/login', {
+      const res = await fetch(`${API_BASE}/api/recruiter/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
@@ -75,7 +76,7 @@ export default function RecruiterPage() {
   const fetchCandidates = async (token: string) => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/recruiter/candidates', {
+      const res = await fetch(`${API_BASE}/api/recruiter/candidates`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.status === 401 || res.status === 403) {
@@ -94,7 +95,7 @@ export default function RecruiterPage() {
   const updateStatus = async (id: string, status: string) => {
     try {
       const token = localStorage.getItem('recruiter_token');
-      const res = await fetch(`http://localhost:3001/api/recruiter/candidates/${id}/status`, {
+      const res = await fetch(`${API_BASE}/api/recruiter/candidates/${id}/status`, {
         method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',

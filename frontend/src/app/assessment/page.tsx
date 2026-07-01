@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Clock, ShieldAlert, CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { API_BASE } from '@/lib/api';
 
 function AssessmentEngine() {
   const router = useRouter();
@@ -31,7 +32,7 @@ function AssessmentEngine() {
       return;
     }
 
-    fetch(`http://localhost:3001/api/test/generate/${domain}?candidateId=${candidateId}`)
+    fetch(`${API_BASE}/api/test/generate/${domain}?candidateId=${candidateId}`)
       .then(res => res.json())
       .then(data => {
         setQuestions(data.questions || []);
@@ -49,7 +50,7 @@ function AssessmentEngine() {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/test/submit', {
+      const res = await fetch(`${API_BASE}/api/test/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

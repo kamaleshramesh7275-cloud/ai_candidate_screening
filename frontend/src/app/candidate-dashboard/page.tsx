@@ -12,6 +12,7 @@ import {
   Github, Linkedin, User, AlertTriangle, Clock, ShieldAlert, 
   CheckCircle2, XCircle, Sun, Moon, LogOut, FileText 
 } from 'lucide-react';
+import { API_BASE } from '@/lib/api';
 
 export default function CandidateDashboard() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export default function CandidateDashboard() {
 
   const fetchCandidateProfile = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/candidate/profile/${id}`);
+      const res = await fetch(`${API_BASE}/api/candidate/profile/${id}`);
       if (!res.ok) {
         throw new Error('Profile not found.');
       }
@@ -114,7 +115,7 @@ export default function CandidateDashboard() {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/candidates/intake', {
+      const res = await fetch(`${API_BASE}/api/candidates/intake`, {
         method: 'POST',
         body: data,
       });
@@ -471,7 +472,7 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
 
   // Fetch Questions
   useEffect(() => {
-    fetch(`http://localhost:3001/api/test/generate/${domain}`)
+    fetch(`${API_BASE}/api/test/generate/${domain}`)
       .then(res => res.json())
       .then(data => {
         setQuestions(data.questions || []);
@@ -489,7 +490,7 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/test/submit', {
+      const res = await fetch(`${API_BASE}/api/test/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
