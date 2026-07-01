@@ -340,7 +340,7 @@ export default function RecruiterDashboard() {
 
         {/* Job Management (Request Hire) */}
         <Card className="glass-card-glow transition-all duration-300 border-none bg-white/5 dark:bg-slate-900/50">
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion className="w-full">
             <AccordionItem value="request-hire" className="border-none">
               <AccordionTrigger className="px-6 py-4 hover:no-underline text-xl font-bold text-white">
                 Request to Hire (Create Job)
