@@ -57,8 +57,8 @@ app.patch('/api/recruiter/candidates/:id/notes', authenticateRecruiter, updateCa
 // Serve static files from the Next.js export in production
 app.use(express.static(path.join(__dirname, '../../frontend/out')));
 
-// Catch-all route to hand off client-side routing to Next.js
-app.get('*', (req: Request, res: Response) => {
+// Catch-all middleware to hand off client-side routing to Next.js
+app.use((req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '../../frontend/out/index.html'));
 });
 
