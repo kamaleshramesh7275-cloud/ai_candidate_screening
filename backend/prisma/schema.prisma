@@ -11,39 +11,17 @@ model Candidate {
   id              String   @id @default(uuid())
   name            String
   email           String   @unique
-  password        String?  // Hashed - optional for backwards compat with intake flow
+  password        String?
   linkedInUrl     String?
   githubUrl       String?
-  resumeText      String?
-  domain          String?
-  
-  // Phase 1 Scores & Verification
-  resumeScore     Float?
-  githubScore     Float?
-  linkedInScore   Float?
-  skillsMatchLog  String?  // Storing JSON as string
-  githubRawData   String?  // Storing JSON as string
-  linkedInRawData String?  // Storing JSON as string
-  
-  // Phase 2 Test Data
-  testCompleted   Boolean  @default(false)
-  testScore       Float?
-  testStartTime   DateTime?
-  cheatStrikes    Int      @default(0)
-  cheatLog        String?  // Storing JSON as string
-  codeReplayData  String?  // Storing JSON array as string
-  videoRecording  String?  // Storing base64 webm video
-  
-  // Recruiter Notes
-  recruiterNotes  String?
-  
-  // Overall Status
-  overallScore    Float?
-  status          String   @default("Applied") // Applied, Tested, Shortlisted, Rejected
-  
+  resumeText      String?  // Extracted text from resume PDF
+  githubRawData   String?  // Cached GitHub API data (JSON string)
+  linkedInRawData String?  // Cached LinkedIn data (JSON string)
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   interviews      Interview[]
+  applications    JobApplication[]
 }
 
 model Recruiter {
@@ -51,19 +29,58 @@ model Recruiter {
   email     String   @unique
   password  String   // Hashed
   name      String
+  company   String?
   jobs      Job[]
 }
 
 model Job {
-  id          String      @id @default(uuid())
-  title       String
-  companyName String
-  salary      String
-  description String
-  recruiterId String
-  recruiter   Recruiter   @relation(fields: [recruiterId], references: [id])
-  interviews  Interview[]
-  createdAt   DateTime    @default(now())
+  id           String           @id @default(uuid())
+  title        String
+  companyName  String
+  salary       String
+  description  String
+  domain       String           @default("General CS") // Frontend | Backend | DevOps | ML | General CS
+  isOpen       Boolean          @default(true)
+  recruiterId  String
+  recruiter    Recruiter        @relation(fields: [recruiterId], references: [id])
+  interviews   Interview[]
+  applications JobApplication[]
+  createdAt    DateTime         @default(now())
+}
+
+model JobApplication {
+  id              String    @id @default(uuid())
+  candidateId     String
+  candidate       Candidate @relation(fields: [candidateId], references: [id])
+  jobId           String
+  job             Job       @relation(fields: [jobId], references: [id])
+
+  // Per-job evaluation scores
+  resumeScore     Float?
+  githubScore     Float?
+  linkedInScore   Float?
+  skillsMatchLog  String?   // JSON string
+  overallScore    Float?
+
+  // Test data
+  testCompleted   Boolean   @default(false)
+  testScore       Float?
+  testStartTime   DateTime?
+  cheatStrikes    Int       @default(0)
+  cheatLog        String?   // JSON string
+  codeReplayData  String?   // JSON string
+  videoRecording  String?   // base64 webm
+
+  // Status
+  status          String    @default("Applied") // Applied | Evaluated | Tested | Shortlisted | Rejected
+
+  // Recruiter notes on this application
+  recruiterNotes  String?
+
+  appliedAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([candidateId, jobId]) // One application per job per candidate
 }
 
 model Interview {

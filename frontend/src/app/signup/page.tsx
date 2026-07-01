@@ -1,30 +1,45 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Mail, Lock, User, Loader2, ArrowRight, EyeOff, Eye, Users, Briefcase } from "lucide-react";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
+import {
+  Mail, Lock, User, Loader2, ArrowRight, EyeOff, Eye,
+  Users, Briefcase, Github, Linkedin, UploadCloud, CheckCircle2,
+} from "lucide-react";
+import { API_BASE } from "@/lib/api";
 
 function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const role = (searchParams.get("role") || "recruiter") as "candidate" | "recruiter";
 
+  // Common fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [company, setCompany] = useState(""); // recruiter only
+  const [company, setCompany] = useState("");
   const [terms, setTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Candidate-only fields
+  const [githubUrl, setGithubUrl] = useState("");
+  const [linkedInUrl, setLinkedInUrl] = useState("");
+  const [resume, setResume] = useState<File | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isCandidate = role === "candidate";
   const accentColor = isCandidate ? "#2a5bff" : "#ff2a75";
   const accentGlow = isCandidate ? "rgba(42,91,255,0.3)" : "rgba(255,42,117,0.3)";
+
+  const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setResume(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,24 +57,32 @@ function SignupForm() {
     setLoading(true);
     try {
       if (isCandidate) {
+        // Use FormData to support file upload
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("password", password);
+        if (githubUrl) formData.append("githubUrl", githubUrl);
+        if (linkedInUrl) formData.append("linkedInUrl", linkedInUrl);
+        if (resume) formData.append("resume", resume);
+
         const res = await fetch(`${API_BASE}/api/candidate/register`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
+          body: formData,
+          credentials: "include",
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Registration failed");
-        localStorage.setItem("candidate_session", JSON.stringify(data));
         router.push("/candidate-dashboard");
       } else {
         const res = await fetch(`${API_BASE}/api/recruiter/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, email, password, company }),
+          credentials: "include",
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Registration failed");
-        localStorage.setItem("recruiter_session", JSON.stringify(data));
         router.push("/recruiter-dashboard");
       }
     } catch (err: any) {
@@ -82,7 +105,7 @@ function SignupForm() {
       />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
-      <div className="w-full max-w-md z-10 animate-in fade-in zoom-in duration-500 my-8">
+      <div className="w-full max-w-lg z-10 animate-in fade-in zoom-in duration-500 my-8">
         {/* Header */}
         <div className="flex flex-col items-center justify-center mb-8">
           <div
@@ -180,8 +203,83 @@ function SignupForm() {
               </div>
             )}
 
+            {/* Candidate-only profile fields */}
+            {isCandidate && (
+              <>
+                <div className="pt-2 pb-1">
+                  <div className="flex items-center gap-2 text-xs font-bold text-blue-400 uppercase tracking-widest">
+                    <span className="flex-1 h-px bg-white/10" />
+                    Professional Profile
+                    <span className="flex-1 h-px bg-white/10" />
+                  </div>
+                </div>
+
+                {/* GitHub URL */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">GitHub Profile URL</label>
+                  <div className="relative">
+                    <Github className="absolute left-3.5 top-3.5 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="url"
+                      value={githubUrl}
+                      onChange={(e) => setGithubUrl(e.target.value)}
+                      className="w-full h-11 pl-10 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-1 text-white transition-all placeholder:text-muted-foreground/50"
+                      placeholder="https://github.com/yourusername"
+                    />
+                  </div>
+                </div>
+
+                {/* LinkedIn URL */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">LinkedIn Profile URL</label>
+                  <div className="relative">
+                    <Linkedin className="absolute left-3.5 top-3.5 h-4 w-4 text-muted-foreground" />
+                    <input
+                      type="url"
+                      value={linkedInUrl}
+                      onChange={(e) => setLinkedInUrl(e.target.value)}
+                      className="w-full h-11 pl-10 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-1 text-white transition-all placeholder:text-muted-foreground/50"
+                      placeholder="https://linkedin.com/in/yourprofile"
+                    />
+                  </div>
+                </div>
+
+                {/* Resume Upload */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resume / CV (PDF)</label>
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`flex items-center gap-3 p-4 rounded-xl border-2 border-dashed cursor-pointer transition-all ${
+                      resume
+                        ? "border-blue-500/50 bg-blue-500/10"
+                        : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/8"
+                    }`}
+                  >
+                    {resume ? (
+                      <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
+                    ) : (
+                      <UploadCloud className="w-5 h-5 text-muted-foreground shrink-0" />
+                    )}
+                    <div>
+                      <p className={`text-sm font-medium ${resume ? "text-blue-400" : "text-muted-foreground"}`}>
+                        {resume ? resume.name : "Click to upload your resume"}
+                      </p>
+                      {!resume && <p className="text-xs text-muted-foreground/60 mt-0.5">PDF up to 10MB</p>}
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleResumeChange}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
             {/* Passwords */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 pt-1">
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Password</label>
                 <div className="relative">
@@ -189,6 +287,7 @@ function SignupForm() {
                   <input
                     type={showPassword ? "text" : "password"}
                     required
+                    minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full h-11 pl-10 pr-2 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-1 text-white transition-all placeholder:text-muted-foreground/50"
@@ -237,11 +336,11 @@ function SignupForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-11 flex items-center justify-center font-semibold rounded-xl mt-4 transition-all hover:opacity-90"
+              className="w-full h-11 flex items-center justify-center font-semibold rounded-xl mt-4 transition-all hover:opacity-90 disabled:opacity-60"
               style={{ background: `linear-gradient(135deg, ${accentColor}, #8b5cf6)`, color: "#fff", boxShadow: `0 4px 20px ${accentGlow}` }}
             >
               {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <><Loader2 className="w-5 h-5 animate-spin mr-2" /> Creating account...</>
               ) : (
                 <>
                   <span>Create {isCandidate ? "Candidate" : "Recruiter"} Account</span>

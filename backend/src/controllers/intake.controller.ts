@@ -6,70 +6,87 @@ import { scrapeLinkedIn } from '../services/linkedin.service';
 import { verifySkills } from '../services/verification.service';
 import { calculateResumeScore, calculateGithubScore, calculateLinkedInScore } from '../services/scoring.service';
 
+// Called when a candidate applies to a specific job.
+// Scores their existing profile data against the job's domain.
 export const handleIntake = async (req: Request, res: Response) => {
   try {
-    const { name, email, linkedInUrl, githubUrl, domain } = req.body;
+    const { candidateId, jobId } = req.body;
     const resumeBuffer = req.file?.buffer;
 
-    if (!name || !email) {
-      return res.status(400).json({ error: 'Name and email are required.' });
+    if (!candidateId || !jobId) {
+      return res.status(400).json({ error: 'candidateId and jobId are required.' });
     }
 
-    // 1. Parse Resume (if provided)
-    let resumeText = '';
+    // Fetch candidate profile and job details
+    const [candidate, job] = await Promise.all([
+      prisma.candidate.findUnique({ where: { id: candidateId } }),
+      prisma.job.findUnique({ where: { id: jobId } }),
+    ]);
+
+    if (!candidate) return res.status(404).json({ error: 'Candidate not found.' });
+    if (!job) return res.status(404).json({ error: 'Job not found.' });
+
+    const domain = job.domain;
+
+    // 1. Parse Resume — use uploaded file if provided, else fall back to stored resumeText
+    let resumeText = candidate.resumeText || '';
+    let githubRawData = candidate.githubRawData ? JSON.parse(candidate.githubRawData) : null;
+    let linkedInRawData = candidate.linkedInRawData ? JSON.parse(candidate.linkedInRawData) : null;
+
     if (resumeBuffer) {
       resumeText = await parseResume(resumeBuffer);
+      // Update candidate's stored resume text
+      await prisma.candidate.update({
+        where: { id: candidateId },
+        data: { resumeText },
+      });
     }
 
-    // 2. Fetch GitHub Data
-    let githubData = null;
-    if (githubUrl) {
-      githubData = await fetchGitHubData(githubUrl);
+    // 2. Fetch GitHub Data (use cache if available)
+    if (candidate.githubUrl && !githubRawData) {
+      githubRawData = await fetchGitHubData(candidate.githubUrl);
+      await prisma.candidate.update({
+        where: { id: candidateId },
+        data: { githubRawData: JSON.stringify(githubRawData) },
+      });
     }
 
-    // 3. Scrape LinkedIn (or fallback)
-    let linkedInData = null;
-    if (linkedInUrl) {
-      linkedInData = await scrapeLinkedIn(linkedInUrl);
+    // 3. Scrape LinkedIn (use cache if available)
+    if (candidate.linkedInUrl && !linkedInRawData) {
+      linkedInRawData = await scrapeLinkedIn(candidate.linkedInUrl);
+      await prisma.candidate.update({
+        where: { id: candidateId },
+        data: { linkedInRawData: JSON.stringify(linkedInRawData) },
+      });
     }
 
     // 4. Verify Skills (cross-check resume vs github languages)
     let skillsMatchLog = {};
-    if (resumeText && githubData && githubData.languages) {
-      skillsMatchLog = verifySkills(resumeText, Object.keys(githubData.languages));
+    if (resumeText && githubRawData?.languages) {
+      skillsMatchLog = verifySkills(resumeText, Object.keys(githubRawData.languages));
     }
 
-    // 5. Calculate Initial Scores
+    // 5. Calculate Scores against this specific job's domain
     const resumeScore = calculateResumeScore(resumeText, domain);
-    const githubScore = githubData ? calculateGithubScore(githubData) : 0;
-    const linkedInScore = calculateLinkedInScore(linkedInUrl, linkedInData);
+    const githubScore = githubRawData ? calculateGithubScore(githubRawData) : 0;
+    const linkedInScore = calculateLinkedInScore(candidate.linkedInUrl ?? undefined, linkedInRawData);
 
-    // Save to Database (Update existing candidate based on email)
-    const candidate = await prisma.candidate.update({
-      where: { email },
+    // 6. Update JobApplication with scores
+    const application = await prisma.jobApplication.update({
+      where: { candidateId_jobId: { candidateId, jobId } },
       data: {
-        name,
-        linkedInUrl,
-        githubUrl,
-        resumeText,
-        domain,
         resumeScore,
         githubScore,
         linkedInScore,
         skillsMatchLog: JSON.stringify(skillsMatchLog),
-        githubRawData: githubData ? JSON.stringify(githubData) : null,
-        linkedInRawData: linkedInData ? JSON.stringify(linkedInData) : null,
+        status: 'Evaluated',
       },
     });
 
-    res.status(201).json({
-      message: 'Candidate intake successful',
-      candidateId: candidate.id,
-      scores: {
-        resume: resumeScore,
-        github: githubScore,
-        linkedin: linkedInScore,
-      },
+    res.status(200).json({
+      message: 'Profile evaluated for this job',
+      applicationId: application.id,
+      scores: { resume: resumeScore, github: githubScore, linkedin: linkedInScore },
     });
   } catch (error) {
     console.error('Error during intake:', error);

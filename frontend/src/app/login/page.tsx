@@ -34,10 +34,10 @@ function LoginForm() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
+          credentials: "include",
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Login failed");
-        localStorage.setItem("candidate_session", JSON.stringify(data));
         router.push("/candidate-dashboard");
       } else {
         // Recruiter login
@@ -45,10 +45,10 @@ function LoginForm() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
+          credentials: "include",
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Login failed");
-        localStorage.setItem("recruiter_session", JSON.stringify(data));
         router.push("/recruiter-dashboard");
       }
     } catch (err: any) {
