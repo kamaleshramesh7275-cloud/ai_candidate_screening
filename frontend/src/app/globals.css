@@ -121,7 +121,7 @@
   }
   
   .glass-card-glow {
-    @apply glass-card shadow-[0_0_20px_rgba(139,92,246,0.15)] hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-300;
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-[18px] shadow-[0_0_20px_rgba(139,92,246,0.15)] hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] transition-all duration-300;
   }
   
   .text-gradient {
