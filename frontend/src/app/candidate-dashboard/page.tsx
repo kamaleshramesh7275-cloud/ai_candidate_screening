@@ -20,6 +20,7 @@ export default function CandidateDashboard() {
   const [candidate, setCandidate] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<any>(null);
+  const [interviews, setInterviews] = useState<any[]>([]);
   
   // Sub-view: 'intake' | 'review' | 'test' | 'success'
   const [viewState, setViewState] = useState<'intake' | 'review' | 'test' | 'success'>('intake');
@@ -59,7 +60,20 @@ export default function CandidateDashboard() {
     
     setSession(parsed);
     fetchCandidateProfile(parsed.id);
+    fetchInterviews(parsed.id);
   }, [router]);
+
+  const fetchInterviews = async (id: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/interviews/candidate/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setInterviews(data.interviews || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch interviews', err);
+    }
+  };
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -440,6 +454,39 @@ export default function CandidateDashboard() {
               </Button>
             </CardFooter>
           </Card>
+        )}
+
+        {/* INTERVIEWS SECTION - Visible if viewState is 'success' */}
+        {viewState === 'success' && candidate && (
+          <div className="w-full max-w-xl mt-8 space-y-4">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white">Your Interviews</h3>
+            {interviews.length === 0 ? (
+              <p className="text-slate-500 text-sm">No interviews scheduled yet.</p>
+            ) : (
+              <div className="space-y-4">
+                {interviews.map(interview => (
+                  <Card key={interview.id} className="border-slate-200 dark:border-slate-800">
+                    <CardHeader className="py-3 px-4 flex flex-row items-center justify-between">
+                      <div>
+                        <CardTitle className="text-md font-bold">{interview.job.title}</CardTitle>
+                        <CardDescription className="text-sm">{interview.job.companyName}</CardDescription>
+                      </div>
+                      <span className={`px-2 py-1 text-xs rounded-full font-bold ${
+                        interview.status === 'Upcoming' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' :
+                        interview.status === 'Attended' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' :
+                        'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                      }`}>
+                        {interview.status}
+                      </span>
+                    </CardHeader>
+                    <CardContent className="py-2 px-4 border-t border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-400">
+                      Scheduled for: {new Date(interview.scheduledTime).toLocaleString()}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
       </main>

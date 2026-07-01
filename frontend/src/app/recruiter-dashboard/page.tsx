@@ -62,6 +62,12 @@ export default function RecruiterDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [savingNotes, setSavingNotes] = useState<Record<string, boolean>>({});
+  
+  // Jobs and Interviews State
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [newJob, setNewJob] = useState({ title: '', companyName: '', salary: '', description: '' });
+  const [creatingJob, setCreatingJob] = useState(false);
+  const [scheduleData, setScheduleData] = useState<Record<string, { jobId: string, scheduledTime: string }>>({});
 
   // Sync Theme and Session on load
   useEffect(() => {
@@ -88,7 +94,8 @@ export default function RecruiterDashboard() {
     }
     
     setSession(parsed);
-    fetchCandidates();
+    fetchCandidates(parsed);
+    fetchJobs(parsed.id, parsed.token);
   }, [router]);
 
   const toggleTheme = () => {
@@ -103,9 +110,13 @@ export default function RecruiterDashboard() {
     router.push('/login');
   };
 
-  const fetchCandidates = useCallback(async () => {
+  const fetchCandidates = useCallback(async (sessionData?: any) => {
     try {
-      const res = await fetch(`${API_BASE}/api/recruiter/candidates`);
+      const activeSession = sessionData || session;
+      if (!activeSession) return;
+      const res = await fetch(`${API_BASE}/api/recruiter/candidates`, {
+        headers: { 'Authorization': `Bearer ${activeSession.token}` }
+      });
       const data = await res.json();
       const fetchedCandidates = data.candidates || [];
       setCandidates(fetchedCandidates);
@@ -123,13 +134,83 @@ export default function RecruiterDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [session]);
+
+  const fetchJobs = async (recruiterId: string, token: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/jobs/recruiter/${recruiterId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setJobs(data.jobs || []);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCreateJob = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!session) return;
+    setCreatingJob(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/jobs`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.token}`
+        },
+        body: JSON.stringify({ ...newJob, recruiterId: session.id })
+      });
+      if (res.ok) {
+        setNewJob({ title: '', companyName: '', salary: '', description: '' });
+        fetchJobs(session.id, session.token);
+        alert('Job created successfully');
+      } else {
+        alert('Failed to create job');
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setCreatingJob(false);
+    }
+  };
+
+  const handleScheduleInterview = async (candidateId: string) => {
+    const data = scheduleData[candidateId];
+    if (!data || !data.jobId || !data.scheduledTime) {
+      alert('Please select a job and a time');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE}/api/interviews`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.token}`
+        },
+        body: JSON.stringify({ candidateId, jobId: data.jobId, scheduledTime: data.scheduledTime })
+      });
+      if (res.ok) {
+        alert('Interview scheduled successfully!');
+      } else {
+        alert('Failed to schedule interview');
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  };
 
   const updateStatus = async (id: string, status: string) => {
+    if (!session) return;
     try {
       await fetch(`${API_BASE}/api/recruiter/candidates/${id}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.token}`
+        },
         body: JSON.stringify({ status })
       });
       fetchCandidates();
@@ -139,11 +220,15 @@ export default function RecruiterDashboard() {
   };
 
   const saveCandidateNotes = async (id: string) => {
+    if (!session) return;
     setSavingNotes(prev => ({ ...prev, [id]: true }));
     try {
       await fetch(`${API_BASE}/api/recruiter/candidates/${id}/notes`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.token}`
+        },
         body: JSON.stringify({ notes: notes[id] ?? '' })
       });
       fetchCandidates();
@@ -252,6 +337,79 @@ export default function RecruiterDashboard() {
             />
           </div>
         </div>
+
+        {/* Job Management (Request Hire) */}
+        <Card className="glass-card-glow transition-all duration-300 border-none bg-white/5 dark:bg-slate-900/50">
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="request-hire" className="border-none">
+              <AccordionTrigger className="px-6 py-4 hover:no-underline text-xl font-bold text-white">
+                Request to Hire (Create Job)
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-6 pt-2">
+                <form onSubmit={handleCreateJob} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-300">Job Role</Label>
+                    <Input 
+                      required 
+                      value={newJob.title}
+                      onChange={(e) => setNewJob({...newJob, title: e.target.value})}
+                      className="bg-slate-50 dark:bg-slate-950 border-white/10" 
+                      placeholder="e.g. Senior Frontend Engineer" 
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-300">Company Name</Label>
+                    <Input 
+                      required 
+                      value={newJob.companyName}
+                      onChange={(e) => setNewJob({...newJob, companyName: e.target.value})}
+                      className="bg-slate-50 dark:bg-slate-950 border-white/10" 
+                      placeholder="e.g. Acme Corp" 
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-300">Salary Range</Label>
+                    <Input 
+                      required 
+                      value={newJob.salary}
+                      onChange={(e) => setNewJob({...newJob, salary: e.target.value})}
+                      className="bg-slate-50 dark:bg-slate-950 border-white/10" 
+                      placeholder="e.g. $120k - $150k" 
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-slate-300">Job Description</Label>
+                    <Input 
+                      required 
+                      value={newJob.description}
+                      onChange={(e) => setNewJob({...newJob, description: e.target.value})}
+                      className="bg-slate-50 dark:bg-slate-950 border-white/10" 
+                      placeholder="Brief description..." 
+                    />
+                  </div>
+                  <div className="md:col-span-2 mt-2">
+                    <Button type="submit" disabled={creatingJob} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold h-10 rounded-xl">
+                      {creatingJob ? 'Creating...' : 'Submit Hire Request'}
+                    </Button>
+                  </div>
+                </form>
+
+                {jobs.length > 0 && (
+                  <div className="mt-6">
+                    <h4 className="text-sm font-bold text-slate-300 mb-2">Active Jobs</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {jobs.map(j => (
+                        <Badge key={j.id} variant="outline" className="border-indigo-500 text-indigo-400 bg-indigo-950/30">
+                          {j.title} at {j.companyName}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </Card>
 
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -821,6 +979,45 @@ export default function RecruiterDashboard() {
                             onClick={() => saveCandidateNotes(c.id)}
                           >
                             {savingNotes[c.id] ? 'Saving...' : 'Save Notes'}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {/* Schedule Interview */}
+                      <div className="md:col-span-2 border-t border-white/10 pt-4 mt-2">
+                        <h4 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-blue-500" />
+                          Schedule Interview
+                        </h4>
+                        <div className="flex flex-col sm:flex-row gap-3 items-end bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-white/10">
+                          <div className="w-full space-y-1.5">
+                            <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Job</Label>
+                            <select 
+                              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg h-10 px-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                              value={scheduleData[c.id]?.jobId || ''}
+                              onChange={(e) => setScheduleData(prev => ({ ...prev, [c.id]: { ...prev[c.id], jobId: e.target.value } }))}
+                            >
+                              <option value="">-- Choose Job --</option>
+                              {jobs.map(j => (
+                                <option key={j.id} value={j.id}>{j.title} at {j.companyName}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="w-full space-y-1.5">
+                            <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Date & Time</Label>
+                            <Input 
+                              type="datetime-local" 
+                              className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                              value={scheduleData[c.id]?.scheduledTime || ''}
+                              onChange={(e) => setScheduleData(prev => ({ ...prev, [c.id]: { ...prev[c.id], scheduledTime: e.target.value } }))}
+                            />
+                          </div>
+                          <Button 
+                            className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-10 w-full sm:w-auto px-6 whitespace-nowrap"
+                            onClick={() => handleScheduleInterview(c.id)}
+                            disabled={!scheduleData[c.id]?.jobId || !scheduleData[c.id]?.scheduledTime}
+                          >
+                            Schedule
                           </Button>
                         </div>
                       </div>

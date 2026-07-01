@@ -22,6 +22,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 import { generateTest, submitTest } from './controllers/test.controller';
 import { getCandidates, updateCandidateStatus, updateCandidateNotes } from './controllers/recruiter.controller';
+import { createJob, getJobsForRecruiter } from './controllers/job.controller';
+import { scheduleInterview, getCandidateInterviews, getRecruiterInterviews } from './controllers/interview.controller';
 
 // Middleware to protect recruiter routes
 const authenticateRecruiter = (req: Request, res: Response, next: NextFunction): void => {
@@ -53,6 +55,15 @@ app.post('/api/recruiter/login', recruiterLogin);
 app.get('/api/recruiter/candidates', authenticateRecruiter, getCandidates);
 app.patch('/api/recruiter/candidates/:id/status', authenticateRecruiter, updateCandidateStatus);
 app.patch('/api/recruiter/candidates/:id/notes', authenticateRecruiter, updateCandidateNotes);
+
+// Jobs
+app.post('/api/jobs', authenticateRecruiter, createJob);
+app.get('/api/jobs/recruiter/:recruiterId', authenticateRecruiter, getJobsForRecruiter);
+
+// Interviews
+app.post('/api/interviews', authenticateRecruiter, scheduleInterview);
+app.get('/api/interviews/recruiter/:recruiterId', authenticateRecruiter, getRecruiterInterviews);
+app.get('/api/interviews/candidate/:candidateId', getCandidateInterviews);
 
 // Serve static files from the Next.js export in production
 app.use(express.static(path.join(__dirname, '../../frontend/out')));
