@@ -44,11 +44,11 @@ export const handleIntake = async (req: Request, res: Response) => {
     const githubScore = githubData ? calculateGithubScore(githubData) : 0;
     const linkedInScore = calculateLinkedInScore(linkedInUrl, linkedInData);
 
-    // Save to Database
-    const candidate = await prisma.candidate.create({
+    // Save to Database (Update existing candidate based on email)
+    const candidate = await prisma.candidate.update({
+      where: { email },
       data: {
         name,
-        email,
         linkedInUrl,
         githubUrl,
         resumeText,
