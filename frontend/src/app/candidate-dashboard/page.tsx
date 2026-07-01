@@ -136,7 +136,7 @@ export default function CandidateDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center text-slate-900 dark:text-slate-50">
+      <div className="min-h-screen relative overflow-hidden bg-background flex flex-col items-center justify-center text-slate-900 dark:text-slate-50">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-650" />
         <p className="mt-4 text-sm font-semibold text-slate-500">Loading Candidate Workspace...</p>
       </div>
@@ -144,10 +144,10 @@ export default function CandidateDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-300">
+    <div className="min-h-screen relative overflow-hidden bg-background text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-300">
       
       {/* HUD Header */}
-      <header className="sticky top-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300">
+      <header className="sticky top-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-white/10 shadow-sm transition-all duration-300">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-lg text-slate-850 dark:text-white">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-1.5 rounded-lg text-white">
@@ -164,7 +164,7 @@ export default function CandidateDashboard() {
 
             <button 
               onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-all cursor-pointer"
+              className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground transition-all cursor-pointer"
             >
               {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </button>
@@ -189,11 +189,11 @@ export default function CandidateDashboard() {
           <Card className="w-full border-slate-250 dark:border-slate-800 shadow-xl rounded-2xl overflow-hidden bg-white dark:bg-slate-900 transition-all duration-300">
             <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 to-indigo-600"></div>
             <CardHeader className="pb-4">
-              <CardTitle className="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+              <CardTitle className="text-2xl font-extrabold text-white flex items-center gap-2">
                 <FileText className="w-6 h-6 text-blue-650" />
                 Talent Application Intake
               </CardTitle>
-              <CardDescription className="text-slate-500 dark:text-slate-400">
+              <CardDescription className="text-muted-foreground">
                 Please upload your resume and connect your profiles. Our logic scoring engine uses these to build a skills matrix before technical assessment.
               </CardDescription>
             </CardHeader>
@@ -201,7 +201,7 @@ export default function CandidateDashboard() {
               <CardContent className="space-y-5">
                 
                 <div className="space-y-1.5">
-                  <Label htmlFor="domain" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Target Role / Domain</Label>
+                  <Label htmlFor="domain" className="text-xs font-bold text-slate-300 uppercase tracking-wide">Target Role / Domain</Label>
                   <Select required onValueChange={(value: string | null) => setFormData({...formData, domain: value || ''})}>
                     <SelectTrigger className="bg-slate-50 hover:bg-slate-100/50 dark:bg-slate-950 border-slate-250 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-indigo-500 h-11 text-slate-800 dark:text-slate-200">
                       <SelectValue placeholder="Select your expertise area" />
@@ -218,7 +218,7 @@ export default function CandidateDashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-1.5">
-                    <Label htmlFor="linkedin" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">LinkedIn URL</Label>
+                    <Label htmlFor="linkedin" className="text-xs font-bold text-slate-300 uppercase tracking-wide">LinkedIn URL</Label>
                     <div className="relative">
                       <Linkedin className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                       <Input 
@@ -233,7 +233,7 @@ export default function CandidateDashboard() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="github" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">GitHub URL</Label>
+                    <Label htmlFor="github" className="text-xs font-bold text-slate-300 uppercase tracking-wide">GitHub URL</Label>
                     <div className="relative">
                       <Github className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                       <Input 
@@ -249,8 +249,8 @@ export default function CandidateDashboard() {
                 </div>
 
                 <div className="space-y-2 pt-1">
-                  <Label htmlFor="resume" className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Upload Resume (PDF only)</Label>
-                  <div className="border-2 border-dashed border-slate-300 dark:border-slate-750 hover:border-slate-400 dark:hover:border-slate-600 rounded-xl p-6 flex flex-col items-center justify-center text-center bg-slate-50 dark:bg-slate-950/40 hover:bg-slate-100/50 dark:hover:bg-slate-950/70 transition-colors relative cursor-pointer">
+                  <Label htmlFor="resume" className="text-xs font-bold text-slate-300 uppercase tracking-wide">Upload Resume (PDF only)</Label>
+                  <div className="border-2 border-dashed border-slate-300 dark:border-slate-750 hover:border-slate-400 dark:hover:border-slate-600 rounded-xl p-6 flex flex-col items-center justify-center text-center bg-white/5 hover:bg-slate-100/50 dark:hover:bg-slate-950/70 transition-colors relative cursor-pointer">
                     <Input 
                       id="resume" 
                       type="file" 
@@ -260,10 +260,10 @@ export default function CandidateDashboard() {
                       onChange={(e) => setResume(e.target.files?.[0] || null)}
                     />
                     <UploadCloud className="w-8 h-8 text-slate-400 dark:text-slate-500 mb-2" />
-                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    <p className="text-sm font-semibold text-slate-300">
                       {resume ? resume.name : "Click or drag resume file to upload"}
                     </p>
-                    {!resume && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Maximum file size 5MB</p>}
+                    {!resume && <p className="text-xs text-muted-foreground mt-1">Maximum file size 5MB</p>}
                   </div>
                 </div>
 
@@ -291,17 +291,17 @@ export default function CandidateDashboard() {
             
             {/* Header info */}
             <div className="text-center md:text-left">
-              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-3xl font-extrabold tracking-tight text-white">
                 Application Verified
               </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Your intake profile has been processed by our algorithmic indexing engine. Below are your initial domain match scores.
               </p>
             </div>
 
             {/* Score Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md">
+              <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
                     <span>Resume Score</span>
@@ -309,15 +309,15 @@ export default function CandidateDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-2">
-                  <div className="text-4xl font-black text-slate-900 dark:text-white">{candidate.resumeScore?.toFixed(1) || '0.0'}</div>
+                  <div className="text-4xl font-black text-white">{candidate.resumeScore?.toFixed(1) || '0.0'}</div>
                   <div className="w-full bg-slate-100 dark:bg-slate-850 h-2 rounded-full mt-3 overflow-hidden">
                     <div className="h-full bg-blue-500" style={{ width: `${candidate.resumeScore || 0}%` }}></div>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Keywords parsed and indexed for role: {candidate.domain}.</p>
+                  <p className="text-xs text-muted-foreground mt-2">Keywords parsed and indexed for role: {candidate.domain}.</p>
                 </CardContent>
               </Card>
 
-              <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md">
+              <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-bold text-slate-455 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
                     <span>GitHub Score</span>
@@ -325,15 +325,15 @@ export default function CandidateDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-2">
-                  <div className="text-4xl font-black text-slate-900 dark:text-white">{candidate.githubScore?.toFixed(1) || '0.0'}</div>
+                  <div className="text-4xl font-black text-white">{candidate.githubScore?.toFixed(1) || '0.0'}</div>
                   <div className="w-full bg-slate-100 dark:bg-slate-850 h-2 rounded-full mt-3 overflow-hidden">
                     <div className="h-full bg-purple-500" style={{ width: `${candidate.githubScore || 0}%` }}></div>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Calculated from stars, repo count, and push activities.</p>
+                  <p className="text-xs text-muted-foreground mt-2">Calculated from stars, repo count, and push activities.</p>
                 </CardContent>
               </Card>
 
-              <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md">
+              <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-bold text-slate-455 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
                     <span>LinkedIn Score</span>
@@ -341,24 +341,24 @@ export default function CandidateDashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-2">
-                  <div className="text-4xl font-black text-slate-900 dark:text-white">{candidate.linkedInScore?.toFixed(1) || '0.0'}</div>
+                  <div className="text-4xl font-black text-white">{candidate.linkedInScore?.toFixed(1) || '0.0'}</div>
                   <div className="w-full bg-slate-100 dark:bg-slate-850 h-2 rounded-full mt-3 overflow-hidden">
                     <div className="h-full bg-indigo-500" style={{ width: `${candidate.linkedInScore || 0}%` }}></div>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Parsed headlines and professional history indicators.</p>
+                  <p className="text-xs text-muted-foreground mt-2">Parsed headlines and professional history indicators.</p>
                 </CardContent>
               </Card>
             </div>
 
             {/* Test Invite Proctored Panel */}
-            <Card className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl rounded-2xl overflow-hidden mt-6">
+            <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-xl rounded-2xl overflow-hidden mt-6">
               <div className="h-1.5 w-full bg-red-500"></div>
               <CardHeader>
-                <CardTitle className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
                   <ShieldAlert className="w-5.5 h-5.5 text-red-500 animate-pulse" />
                   Coding Assessment Invitation
                 </CardTitle>
-                <CardDescription className="text-slate-500 dark:text-slate-400">
+                <CardDescription className="text-muted-foreground">
                   You are required to take a short proctored assessment for {candidate.domain} to finalize your scores.
                 </CardDescription>
               </CardHeader>
@@ -393,23 +393,23 @@ export default function CandidateDashboard() {
 
         {/* VIEW 4: ASSESSMENT COMPLETED SUCCESS VIEW */}
         {viewState === 'success' && candidate && (
-          <Card className="w-full max-w-xl border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl overflow-hidden bg-white dark:bg-slate-900 transition-all duration-300">
+          <Card className="w-full max-w-xl border-white/10 shadow-2xl rounded-2xl overflow-hidden bg-white dark:bg-slate-900 transition-all duration-300">
             <div className="h-1.5 w-full bg-emerald-500"></div>
             <CardHeader className="text-center pb-4 pt-8">
               <div className="mx-auto bg-emerald-50 dark:bg-emerald-950/20 w-16 h-16 rounded-full flex items-center justify-center mb-4">
                 <CheckCircle2 className="w-9 h-9 text-emerald-500" />
               </div>
-              <CardTitle className="text-3xl font-extrabold text-slate-900 dark:text-white">Assessment Submitted</CardTitle>
-              <CardDescription className="text-slate-500 dark:text-slate-400 mt-2 text-sm">
+              <CardTitle className="text-3xl font-extrabold text-white">Assessment Submitted</CardTitle>
+              <CardDescription className="text-muted-foreground mt-2 text-sm">
                 Thank you for completing the AI Recruiter assessment.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 px-6">
               
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 grid grid-cols-2 gap-4">
-                <div className="text-center border-r border-slate-200 dark:border-slate-800">
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10/80 grid grid-cols-2 gap-4">
+                <div className="text-center border-r border-white/10">
                   <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Test Score</div>
-                  <div className="text-3xl font-black text-slate-900 dark:text-white mt-1">
+                  <div className="text-3xl font-black text-white mt-1">
                     {candidate.testScore?.toFixed(1) || '0.0'}%
                   </div>
                 </div>
@@ -601,7 +601,7 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
   };
 
   if (loading) return (
-    <div className="w-full flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow">
+    <div className="w-full flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-900 border border-white/10 rounded-2xl shadow">
       <Loader2 className="w-8 h-8 animate-spin text-slate-500" />
       <p className="mt-4 text-sm font-semibold text-slate-500">Loading Assessment Environment...</p>
     </div>
@@ -609,27 +609,27 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
 
   if (!started) {
     return (
-      <Card className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xl">
-        <CardHeader className="text-center pb-6 border-b border-slate-100 dark:border-slate-800/80">
+      <Card className="w-full bg-white dark:bg-slate-900 border-white/10 shadow-2xl">
+        <CardHeader className="text-center pb-6 border-b border-white/10/80">
           <div className="mx-auto bg-red-500/10 w-16 h-16 rounded-full flex items-center justify-center mb-4">
             <ShieldAlert className="w-8 h-8 text-red-500 animate-pulse" />
           </div>
-          <CardTitle className="text-2xl text-slate-900 dark:text-white">Proctored Assessment Setup</CardTitle>
+          <CardTitle className="text-2xl text-white">Proctored Assessment Setup</CardTitle>
           <CardDescription className="text-red-500 font-bold mt-2">
             Active Proctoring Sandboxing Environment
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-700 dark:text-slate-350">
-            <div className="flex items-start gap-3 p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-150 dark:border-slate-800/80">
+            <div className="flex items-start gap-3 p-3.5 bg-white/5 rounded-xl border border-slate-150 dark:border-slate-800/80">
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               <p className="text-xs">Do not switch tabs, minimize window or navigate away.</p>
             </div>
-            <div className="flex items-start gap-3 p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-150 dark:border-slate-800/80">
+            <div className="flex items-start gap-3 p-3.5 bg-white/5 rounded-xl border border-slate-150 dark:border-slate-800/80">
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               <p className="text-xs">Copying, pasting, or right-clicking is disabled.</p>
             </div>
-            <div className="flex items-start gap-3 p-3.5 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-150 dark:border-slate-800/80">
+            <div className="flex items-start gap-3 p-3.5 bg-white/5 rounded-xl border border-slate-150 dark:border-slate-800/80">
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               <p className="text-xs">Developer Tools activation monitors are active.</p>
             </div>
@@ -662,7 +662,7 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
     <div className="w-full space-y-6">
       
       {/* HUD Timer and Strikes stats */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-white/10">
         <div className="flex items-center gap-4 w-full sm:w-auto">
           <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Progress</div>
           <div className="flex-1 sm:flex-none bg-slate-100 dark:bg-slate-800 h-2 w-full sm:w-32 md:w-48 rounded-full overflow-hidden">
@@ -696,7 +696,7 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
       </div>
       
       {/* Question Card */}
-      <Card className="border-0 shadow-lg overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+      <Card className="border-0 shadow-lg overflow-hidden bg-white dark:bg-slate-900 border border-white/10">
         <CardHeader className="bg-slate-50/50 dark:bg-slate-950/20 p-6 border-b border-slate-100 dark:border-slate-850/50">
           <CardTitle className="text-xl font-bold text-slate-850 dark:text-white leading-normal">
             {currentQ.question}

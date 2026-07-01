@@ -182,19 +182,21 @@ export default function RecruiterDashboard() {
   );
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center text-slate-900 dark:text-slate-50">
+    <div className="min-h-screen relative overflow-hidden bg-background flex flex-col items-center justify-center text-slate-900 dark:text-slate-50">
       <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-      <p className="mt-4 text-slate-500 dark:text-slate-400 font-semibold">Loading Recruiter Panel...</p>
+      <p className="mt-4 text-muted-foreground font-semibold">Loading Recruiter Panel...</p>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+    <div className="min-h-screen relative overflow-hidden bg-background text-foreground transition-colors duration-300 blob-placed">
+      <div className="absolute top-1/4 -left-20 w-[40vw] h-[40vw] rounded-full bg-ai-violet/10 blur-[120px] animate-pulse pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-[30vw] h-[30vw] rounded-full bg-ai-cyan/10 blur-[100px] animate-pulse duration-7000 pointer-events-none" />
       
       {/* Top Navbar */}
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-15 shadow-sm transition-all duration-300">
+      <header className="bg-background/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-15 shadow-sm transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-xl text-slate-800 dark:text-white cursor-pointer" onClick={() => router.push('/')}>
+          <div className="flex items-center gap-2 font-bold text-xl text-white cursor-pointer" onClick={() => router.push('/')}>
             <div className="bg-blue-600 p-1.5 rounded text-white"><Users className="w-5 h-5" /></div>
             AI Recruiter
           </div>
@@ -210,13 +212,13 @@ export default function RecruiterDashboard() {
               />
             </div>
 
-            <Button onClick={exportCSV} variant="outline" className="rounded-xl shadow-sm border-slate-200 dark:border-slate-800">
+            <Button onClick={exportCSV} variant="outline" className="rounded-xl shadow-sm border-white/10">
               <Download className="w-4 h-4 mr-2" /> Export CSV
             </Button>
 
             <button 
               onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-slate-105 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-all cursor-pointer"
+              className="p-2 rounded-full hover:bg-slate-105 dark:hover:bg-slate-800 text-muted-foreground transition-all cursor-pointer"
             >
               {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </button>
@@ -234,8 +236,8 @@ export default function RecruiterDashboard() {
         {/* Profile indicator */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Recruiter Workspace</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <h1 className="text-3xl font-extrabold tracking-tight text-white">Recruiter Workspace</h1>
+            <p className="text-xs text-muted-foreground mt-1">
               Logged in as: <strong className="text-indigo-650 dark:text-indigo-400">{session?.name}</strong> ({session?.email})
             </p>
           </div>
@@ -253,18 +255,18 @@ export default function RecruiterDashboard() {
 
         {/* Stats Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300">
-            <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Total Applicants</div>
-            <div className="text-3xl font-black text-slate-900 dark:text-white">{candidates.length}</div>
+          <div className="glass-card-glow transition-all duration-300">
+            <div className="text-sm font-semibold text-muted-foreground mb-1">Total Applicants</div>
+            <div className="text-3xl font-black text-white">{candidates.length}</div>
           </div>
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300">
-            <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Shortlisted</div>
+          <div className="glass-card-glow transition-all duration-300">
+            <div className="text-sm font-semibold text-muted-foreground mb-1">Shortlisted</div>
             <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400">
               {candidates.filter(c => c.status === 'Shortlisted').length}
             </div>
           </div>
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300">
-            <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-1">Avg Score</div>
+          <div className="glass-card-glow transition-all duration-300">
+            <div className="text-sm font-semibold text-muted-foreground mb-1">Avg Score</div>
             <div className="text-3xl font-black text-blue-600 dark:text-blue-400">
               {candidates.length ? (candidates.reduce((a,c) => a + (c.overallScore || 0), 0) / candidates.length).toFixed(1) : '0.0'}
             </div>
@@ -275,9 +277,9 @@ export default function RecruiterDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Status Distribution */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors duration-300">
+          <div className="glass-card-glow flex flex-col justify-between transition-colors duration-300">
             <div>
-              <h3 className="text-md font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+              <h3 className="text-md font-bold text-white mb-4 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-blue-500" />
                 Status Distribution
               </h3>
@@ -331,7 +333,7 @@ export default function RecruiterDashboard() {
                         })}
                       </svg>
                       <div className="absolute flex flex-col items-center justify-center">
-                        <span className="text-xl font-extrabold text-slate-800 dark:text-white">{total}</span>
+                        <span className="text-xl font-extrabold text-white">{total}</span>
                         <span className="text-[10px] text-slate-400 font-semibold uppercase">Total</span>
                       </div>
                     </div>
@@ -356,9 +358,9 @@ export default function RecruiterDashboard() {
           </div>
 
           {/* Domains Applied */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors duration-300">
+          <div className="glass-card-glow flex flex-col justify-between transition-colors duration-300">
             <div>
-              <h3 className="text-md font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+              <h3 className="text-md font-bold text-white mb-4 flex items-center gap-2">
                 <Users className="w-4 h-4 text-indigo-500" />
                 Domains Applied
               </h3>
@@ -396,9 +398,9 @@ export default function RecruiterDashboard() {
           </div>
 
           {/* Pass Rate Tracking */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between transition-colors duration-300">
+          <div className="glass-card-glow flex flex-col justify-between transition-colors duration-300">
             <div>
-              <h3 className="text-md font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+              <h3 className="text-md font-bold text-white mb-4 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
                 Assessment Pass Rate
               </h3>
@@ -413,7 +415,7 @@ export default function RecruiterDashboard() {
 
                 return (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between pb-2 border-b border-white/10">
                       <div>
                         <div className="text-3xl font-black text-slate-850 dark:text-white">{passRate.toFixed(1)}%</div>
                         <div className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">Pass Rate (Score ≥ 70)</div>
@@ -425,15 +427,15 @@ export default function RecruiterDashboard() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 pt-1">
-                      <div className="bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 text-center">
+                      <div className="bg-white/5 p-2.5 rounded-xl border border-white/10 text-center">
                         <div className="text-lg font-bold text-slate-800 dark:text-slate-200">{avgTestScore}</div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400">Avg Test Score</div>
+                        <div className="text-[10px] text-muted-foreground">Avg Test Score</div>
                       </div>
-                      <div className="bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 text-center">
+                      <div className="bg-white/5 p-2.5 rounded-xl border border-white/10 text-center">
                         <div className="text-lg font-bold text-red-500">
                           {candidates.reduce((sum, c) => sum + (c.cheatStrikes || 0), 0)}
                         </div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400">Total Proct. Alerts</div>
+                        <div className="text-[10px] text-muted-foreground">Total Proct. Alerts</div>
                       </div>
                     </div>
                   </div>
@@ -446,23 +448,23 @@ export default function RecruiterDashboard() {
         </div>
 
         {/* Data Table */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
+        <div className="glass-card-glow overflow-hidden transition-colors duration-300">
           <Table>
-            <TableHeader className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800">
+            <TableHeader className="bg-white/5 border-b border-white/10">
               <TableRow>
-                <TableHead className="py-4 font-semibold text-slate-700 dark:text-slate-300">Candidate Info</TableHead>
-                <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Target Role</TableHead>
-                <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Algorithmic Score</TableHead>
-                <TableHead className="font-semibold text-slate-700 dark:text-slate-300">Status</TableHead>
-                <TableHead className="text-right font-semibold text-slate-700 dark:text-slate-300">Actions</TableHead>
+                <TableHead className="py-4 font-semibold text-slate-300">Candidate Info</TableHead>
+                <TableHead className="font-semibold text-slate-300">Target Role</TableHead>
+                <TableHead className="font-semibold text-slate-300">Algorithmic Score</TableHead>
+                <TableHead className="font-semibold text-slate-300">Status</TableHead>
+                <TableHead className="text-right font-semibold text-slate-300">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredCandidates.map((c) => (
-                <TableRow key={c.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors border-b border-slate-200 dark:border-slate-800">
+                <TableRow key={c.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors border-b border-white/10">
                   <TableCell>
-                    <div className="font-semibold text-slate-900 dark:text-white">{c.name}</div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">{c.email}</div>
+                    <div className="font-semibold text-white">{c.name}</div>
+                    <div className="text-xs text-muted-foreground">{c.email}</div>
                   </TableCell>
                   <TableCell>
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-400">
@@ -471,7 +473,7 @@ export default function RecruiterDashboard() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <div className="font-mono font-bold text-lg text-slate-700 dark:text-slate-300">
+                      <div className="font-mono font-bold text-lg text-slate-300">
                         {c.overallScore ? c.overallScore.toFixed(1) : '—'}
                       </div>
                       <div className="w-16 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -529,9 +531,9 @@ export default function RecruiterDashboard() {
 
         {/* Detailed Breakdown Accordions */}
         <div className="mt-8 space-y-4">
-          <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4">Detailed Breakdowns</h2>
+          <h2 className="text-xl font-bold text-white mb-4">Detailed Breakdowns</h2>
           {filteredCandidates.map((c) => (
-            <div key={`details-${c.id}`} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300">
+            <div key={`details-${c.id}`} className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-white/10 overflow-hidden transition-all duration-300">
               <Accordion className="w-full">
                 <AccordionItem value="details" className="border-none">
                   <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-slate-50 dark:hover:bg-slate-950/40 data-[state=open]:bg-slate-50 dark:data-[state=open]:bg-slate-950/30 text-left border-none">
@@ -540,23 +542,23 @@ export default function RecruiterDashboard() {
                       <Badge variant="outline" className="font-semibold text-xs text-slate-500 border-slate-305 dark:border-slate-750 bg-white dark:bg-slate-950/40">Full Analysis</Badge>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="px-6 pb-6 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <AccordionContent className="px-6 pb-6 pt-2 border-t border-white/10">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 pt-4">
-                      <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Resume Score</div>
-                        <div className="text-2xl font-black text-slate-800 dark:text-white">{c.resumeScore?.toFixed(1) || '—'}</div>
+                      <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-white/10">
+                        <div className="text-xs font-semibold text-muted-foreground mb-1">Resume Score</div>
+                        <div className="text-2xl font-black text-white">{c.resumeScore?.toFixed(1) || '—'}</div>
                       </div>
-                      <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">GitHub Score</div>
-                        <div className="text-2xl font-black text-slate-800 dark:text-white">{c.githubScore?.toFixed(1) || '—'}</div>
+                      <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-white/10">
+                        <div className="text-xs font-semibold text-muted-foreground mb-1">GitHub Score</div>
+                        <div className="text-2xl font-black text-white">{c.githubScore?.toFixed(1) || '—'}</div>
                       </div>
-                      <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Test Score</div>
-                        <div className="text-2xl font-black text-slate-800 dark:text-white">{c.testScore?.toFixed(1) || '—'}</div>
+                      <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-white/10">
+                        <div className="text-xs font-semibold text-muted-foreground mb-1">Test Score</div>
+                        <div className="text-2xl font-black text-white">{c.testScore?.toFixed(1) || '—'}</div>
                       </div>
-                      <div className={`p-4 rounded-xl border ${c.cheatStrikes > 0 ? 'bg-red-50/50 border-red-100 dark:bg-red-950/15 dark:border-red-900/40' : 'bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800'}`}>
-                        <div className={`text-xs font-semibold mb-1 ${c.cheatStrikes > 0 ? 'text-red-500' : 'text-slate-500 dark:text-slate-400'}`}>Cheat Strikes</div>
-                        <div className={`text-2xl font-black ${c.cheatStrikes > 0 ? 'text-red-600 dark:text-red-400' : 'text-slate-800 dark:text-white'}`}>{c.cheatStrikes || 0}</div>
+                      <div className={`p-4 rounded-xl border ${c.cheatStrikes > 0 ? 'bg-red-50/50 border-red-100 dark:bg-red-950/15 dark:border-red-900/40' : 'bg-slate-50 dark:bg-slate-950 border-white/10'}`}>
+                        <div className={`text-xs font-semibold mb-1 ${c.cheatStrikes > 0 ? 'text-red-500' : 'text-muted-foreground'}`}>Cheat Strikes</div>
+                        <div className={`text-2xl font-black ${c.cheatStrikes > 0 ? 'text-red-600 dark:text-red-400' : 'text-white'}`}>{c.cheatStrikes || 0}</div>
                       </div>
                     </div>
                     
@@ -564,7 +566,7 @@ export default function RecruiterDashboard() {
                       
                       {/* Security Log */}
                       <div>
-                        <h4 className="font-bold text-slate-800 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <h4 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
                           <Activity className="w-4 h-4 text-slate-400" />
                           Security Log
                         </h4>
@@ -586,11 +588,11 @@ export default function RecruiterDashboard() {
                       
                       {/* Skill Verification Matrix */}
                       <div>
-                        <h4 className="font-bold text-slate-800 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <h4 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-slate-400" />
                           Skill Verification Matrix
                         </h4>
-                        <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-200 dark:border-slate-800 h-56 overflow-auto">
+                        <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-white/10 h-56 overflow-auto">
                            {c.skillsMatchLog ? (
                              <div className="space-y-4">
                                <div>
@@ -618,11 +620,11 @@ export default function RecruiterDashboard() {
 
                       {/* GitHub Profile & Heatmap */}
                       <div>
-                        <h4 className="font-bold text-slate-800 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <h4 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
                           <Github className="w-4 h-4 text-slate-400" />
                           GitHub Profile &amp; Commit Activity
                         </h4>
-                        <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-200 dark:border-slate-800 min-h-56 overflow-auto space-y-4">
+                        <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-white/10 min-h-56 overflow-auto space-y-4">
                            {c.githubRawData ? (() => {
                              const gh = JSON.parse(c.githubRawData);
                              const languages = gh.languages || {};
@@ -631,17 +633,17 @@ export default function RecruiterDashboard() {
                              return (
                                <div className="space-y-4">
                                  <div className="grid grid-cols-3 gap-2">
-                                   <div className="bg-white dark:bg-slate-900 rounded-lg p-2.5 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
-                                     <div className="text-lg font-black text-slate-800 dark:text-white">{gh.public_repos ?? '—'}</div>
-                                     <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Repos</div>
+                                   <div className="bg-white dark:bg-slate-900 rounded-lg p-2.5 border border-white/10 text-center shadow-sm">
+                                     <div className="text-lg font-black text-white">{gh.public_repos ?? '—'}</div>
+                                     <div className="text-[10px] text-muted-foreground font-semibold uppercase">Repos</div>
                                    </div>
-                                   <div className="bg-white dark:bg-slate-900 rounded-lg p-2.5 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
+                                   <div className="bg-white dark:bg-slate-900 rounded-lg p-2.5 border border-white/10 text-center shadow-sm">
                                      <div className="text-lg font-black text-amber-600 dark:text-amber-405">{gh.stars ?? '—'}</div>
-                                     <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase">⭐ Stars</div>
+                                     <div className="text-[10px] text-muted-foreground font-semibold uppercase">⭐ Stars</div>
                                    </div>
-                                   <div className="bg-white dark:bg-slate-900 rounded-lg p-2.5 border border-slate-200 dark:border-slate-800 text-center shadow-sm">
+                                   <div className="bg-white dark:bg-slate-900 rounded-lg p-2.5 border border-white/10 text-center shadow-sm">
                                      <div className="text-lg font-black text-emerald-600 dark:text-emerald-400">{gh.recentCommitsScore ?? '—'}</div>
-                                     <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold uppercase">Commits</div>
+                                     <div className="text-[10px] text-muted-foreground font-semibold uppercase">Commits</div>
                                    </div>
                                  </div>
                                  
@@ -663,12 +665,12 @@ export default function RecruiterDashboard() {
 
                                  {/* Heatmap */}
                                  {activity && Object.keys(activity).length > 0 && (
-                                   <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+                                   <div className="pt-2 border-t border-white/10">
                                      <div className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider mb-2 flex items-center gap-1">
                                        <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                                        Commit Activity
                                      </div>
-                                     <div className="flex gap-1 items-end justify-between bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
+                                     <div className="flex gap-1 items-end justify-between bg-white dark:bg-slate-900 p-2 rounded-lg border border-white/10">
                                        {Object.entries(activity).map(([month, count]: any) => {
                                          const countNum = Number(count) || 0;
                                          let color = 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700';
@@ -702,11 +704,11 @@ export default function RecruiterDashboard() {
 
                       {/* LinkedIn Scraped Details */}
                       <div>
-                        <h4 className="font-bold text-slate-800 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <h4 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
                           <Linkedin className="w-4 h-4 text-slate-400" />
                           LinkedIn Profile Data
                         </h4>
-                        <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-slate-200 dark:border-slate-800 h-56 overflow-auto">
+                        <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-4 border border-white/10 h-56 overflow-auto">
                           {c.linkedInRawData ? (() => {
                             const li = JSON.parse(c.linkedInRawData);
                             const data = li.data || li;
@@ -715,13 +717,13 @@ export default function RecruiterDashboard() {
                                 {data.headline && (
                                   <div>
                                     <div className="text-[10px] font-bold text-slate-550 dark:text-slate-400 uppercase tracking-wider mb-1">Headline</div>
-                                    <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 rounded-lg p-2 border border-slate-200 dark:border-slate-800">{data.headline}</div>
+                                    <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 rounded-lg p-2 border border-white/10">{data.headline}</div>
                                   </div>
                                 )}
                                 {data.summary && (
                                   <div>
                                     <div className="text-[10px] font-bold text-slate-550 dark:text-slate-400 uppercase tracking-wider mb-1">Summary</div>
-                                    <div className="text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 rounded-lg p-2 border border-slate-200 dark:border-slate-800 leading-relaxed">{data.summary}</div>
+                                    <div className="text-xs text-slate-300 bg-white dark:bg-slate-900 rounded-lg p-2 border border-white/10 leading-relaxed">{data.summary}</div>
                                   </div>
                                 )}
                                 {!data.headline && !data.summary && (
@@ -742,11 +744,11 @@ export default function RecruiterDashboard() {
 
                       {/* Resume Keyword Heatmap - Full Width */}
                       <div className="md:col-span-2 mt-2">
-                        <h4 className="font-bold text-slate-800 dark:text-white text-sm mb-3 flex items-center gap-2">
+                        <h4 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
                           <StickyNote className="w-4 h-4 text-slate-400" />
                           Resume Keyword Match Heatmap ({c.domain || 'General'} Role)
                         </h4>
-                        <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-5 border border-slate-200 dark:border-slate-800 space-y-4">
+                        <div className="bg-slate-50 dark:bg-slate-950 rounded-xl p-5 border border-white/10 space-y-4">
                           {c.resumeText ? (() => {
                             const domain = c.domain || 'General CS';
                             const keywords = DOMAIN_KEYWORDS[domain] || DOMAIN_KEYWORDS['General CS'];
@@ -771,7 +773,7 @@ export default function RecruiterDashboard() {
                                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
                                           isMatched 
                                             ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-450 border-emerald-250 dark:border-emerald-900/60 shadow-sm' 
-                                            : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800'
+                                            : 'bg-white dark:bg-slate-900 text-slate-400 border-white/10'
                                         }`}
                                       >
                                         <span>{kw}</span>
@@ -786,7 +788,7 @@ export default function RecruiterDashboard() {
                                 </div>
 
                                 <div className="space-y-2">
-                                  <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Resume Text Highlight Viewer</div>
+                                  <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Resume Text Highlight Viewer</div>
                                   <div className="bg-white dark:bg-slate-950 rounded-lg p-4 border border-slate-200 dark:border-slate-850 max-h-60 overflow-auto text-xs text-slate-650 dark:text-slate-400 font-mono whitespace-pre-wrap leading-relaxed">
                                     {highlightKeywords(c.resumeText, keywords)}
                                   </div>
@@ -800,15 +802,15 @@ export default function RecruiterDashboard() {
                       </div>
 
                       {/* Recruiter Notes - Full Width */}
-                      <div className="md:col-span-2 border-t border-slate-200 dark:border-slate-800 pt-4 mt-2">
-                        <h4 className="font-bold text-slate-800 dark:text-white text-sm mb-3 flex items-center gap-2">
+                      <div className="md:col-span-2 border-t border-white/10 pt-4 mt-2">
+                        <h4 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
                           <StickyNote className="w-4 h-4 text-indigo-500 animate-pulse" />
                           Recruiter Evaluation Notes
                         </h4>
                         <div className="flex gap-3 items-start">
                           <textarea
                             rows={3}
-                            className="flex-1 min-h-[80px] text-sm p-3 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-550 focus:outline-none bg-slate-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-950 transition-all resize-none shadow-inner text-slate-800 dark:text-slate-250"
+                            className="flex-1 min-h-[80px] text-sm p-3 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-550 focus:outline-none bg-slate-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-950 transition-all resize-none shadow-inner text-slate-800 dark:text-slate-250"
                             placeholder="Add evaluation summary, interview notes, or screening feedback..."
                             value={notes[c.id] ?? ''}
                             onChange={(e) => setNotes({ ...notes, [c.id]: e.target.value })}
