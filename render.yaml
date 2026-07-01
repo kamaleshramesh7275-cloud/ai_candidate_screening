@@ -7,15 +7,16 @@ databases:
     region: oregon
 
 services:
-  # ── Backend API ──────────────────────────────────────────────────────────────
+  # ── Unified Web Service ──────────────────────────────────────────────────
   - type: web
-    name: ai-screening-backend
+    name: ai-screening-app
     runtime: node
     region: oregon
     plan: free
-    rootDir: backend
-    buildCommand: npm install && npm run build && npx prisma migrate deploy
-    startCommand: npm start
+    # Run from the root so we can build both frontend and backend
+    rootDir: .
+    buildCommand: cd frontend && npm install && npm run build && cd ../backend && npm install && npm run build && npx prisma migrate deploy
+    startCommand: cd backend && npm start
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -29,23 +30,3 @@ services:
         value: admin                 # Change this in the Render dashboard after deploy!
       - key: PORT
         value: "3001"
-
-  # ── Frontend (Next.js SSR) ────────────────────────────────────────────────
-  - type: web
-    name: ai-screening-frontend
-    runtime: node
-    region: oregon
-    plan: free
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: ai-screening-backend
-          property: host
-          # Render exposes the service's https host; prefix with https://
-          # After deploy, manually set this to: https://<backend-service>.onrender.com

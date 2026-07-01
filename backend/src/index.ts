@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
+import path from 'path';
 import cors from 'cors';
 import multer from 'multer';
 import { PrismaClient } from '@prisma/client';
@@ -52,6 +53,14 @@ app.post('/api/recruiter/login', recruiterLogin);
 app.get('/api/recruiter/candidates', authenticateRecruiter, getCandidates);
 app.patch('/api/recruiter/candidates/:id/status', authenticateRecruiter, updateCandidateStatus);
 app.patch('/api/recruiter/candidates/:id/notes', authenticateRecruiter, updateCandidateNotes);
+
+// Serve static files from the Next.js export in production
+app.use(express.static(path.join(__dirname, '../../frontend/out')));
+
+// Catch-all route to hand off client-side routing to Next.js
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname, '../../frontend/out/index.html'));
+});
 
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);
