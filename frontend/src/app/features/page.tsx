@@ -3,134 +3,108 @@
 import { useRouter } from 'next/navigation';
 import { 
   Activity, ShieldCheck, Zap, Github, FileText, BrainCircuit, 
-  Users, CheckCircle, BarChart2, Lock, Globe, ChevronDown, ArrowRight
+  Users, CheckCircle, BarChart2, Lock, Globe, MonitorPlay
 } from 'lucide-react';
 
 export default function FeaturesPage() {
   const router = useRouter();
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#f0f0f0', fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#090a0f', color: '#ffffff', fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         * { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; box-sizing: border-box; }
-        .nav-link { color: #ccc; font-size: 0.875rem; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: color 0.15s; white-space: nowrap; }
-        .nav-link:hover { color: #dc2626; }
-        .btn-red { background: #dc2626; color: white; border: 1px solid #dc2626; padding: 0.65rem 1.75rem; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
-        .btn-red:hover { background: #b91c1c; }
-        .btn-outline { background: transparent; color: #f0f0f0; border: 1px solid #444; padding: 0.65rem 1.75rem; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
-        .btn-outline:hover { border-color: #dc2626; color: #f87171; }
-        .feature-card { padding: 2rem; border: 1px solid #1e1e1e; background: #111; transition: all 0.2s; border-radius: 4px; }
-        .feature-card:hover { border-color: rgba(220,38,38,0.4); background: #161616; transform: translateY(-2px); }
+        .bg-gradient-main {
+          background: radial-gradient(circle at 15% 50%, rgba(103, 31, 163, 0.4), transparent 50%),
+                      radial-gradient(circle at 85% 30%, rgba(31, 75, 163, 0.3), transparent 50%),
+                      radial-gradient(circle at 50% 80%, rgba(255, 42, 117, 0.15), transparent 50%),
+                      #090a0f;
+        }
+        .nav-link { color: #a0a5b5; font-size: 0.875rem; font-weight: 500; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: color 0.2s; white-space: nowrap; }
+        .nav-link:hover { color: #ffffff; }
+        .btn-pink { background: #ff2a75; color: white; border: none; padding: 0.75rem 1.75rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border-radius: 4px; box-shadow: 0 4px 14px 0 rgba(255, 42, 117, 0.39); }
+        .btn-pink:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255, 42, 117, 0.5); }
+        .feature-card { padding: 2.5rem 2rem; border: 1px solid #1c1e2e; background: rgba(21, 23, 37, 0.6); backdrop-filter: blur(10px); transition: all 0.3s; border-radius: 8px; }
+        .feature-card:hover { background: rgba(21, 23, 37, 0.9); border-color: #2a5bff; transform: translateY(-4px); }
         a { text-decoration: none; }
       `}</style>
 
       {/* Navbar */}
-      <nav style={{ borderBottom: '1px solid #1e1e1e', background: '#111', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '1.5rem', height: '52px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0, marginRight: '0.5rem', cursor: 'pointer' }} onClick={() => router.push('/')}>
-            <div style={{ width: 28, height: 28, background: '#dc2626', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Users size={16} color="white" /></div>
-            <span style={{ borderLeft: '1px solid #333', paddingLeft: '0.75rem', fontWeight: '600', fontSize: '1rem', color: '#f0f0f0' }}>AI Recruiter</span>
+      <nav style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(9, 10, 15, 0.8)', backdropFilter: 'blur(12px)', position: 'sticky', top: 0, zIndex: 50 }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', gap: '2rem', height: '64px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0, marginRight: '1rem', cursor: 'pointer' }} onClick={() => router.push('/')}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(45deg, #2a5bff, #ff2a75)' }}></div>
+              <div style={{ width: 24, height: 24, borderRadius: '50%', border: '2px solid #a0a5b5', marginLeft: '-8px' }}></div>
+            </div>
+            <span style={{ fontWeight: '700', fontSize: '1.1rem', color: '#ffffff', letterSpacing: '0.5px' }}>
+              ZINGO<span style={{ fontWeight: '300' }}>RECRUIT</span>
+            </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
             <span className="nav-link" onClick={() => router.push('/apply')}>Candidates</span>
             <span className="nav-link" onClick={() => router.push('/recruiter')}>Recruiters</span>
-            <span className="nav-link" style={{ color: '#dc2626' }}>Features</span>
+            <span className="nav-link" style={{ color: '#ffffff' }}>Features</span>
             <span className="nav-link" onClick={() => router.push('/pricing')}>Pricing</span>
             <span className="nav-link" onClick={() => router.push('/about')}>About</span>
             <span className="nav-link" onClick={() => router.push('/contact')}>Contact</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexShrink: 0 }}>
             <span className="nav-link" onClick={() => router.push('/login')}>Sign in</span>
-            <button className="btn-red" onClick={() => router.push('/apply')} style={{ padding: '0.45rem 1.1rem', fontSize: '0.85rem' }}>Get started free</button>
+            <button className="btn-pink" onClick={() => router.push('/apply')} style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem' }}>GET STARTED</button>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <section style={{ padding: '5rem 1.5rem 4rem', textAlign: 'center', borderBottom: '1px solid #1a1a1a', background: 'linear-gradient(180deg, #0d0505 0%, #0a0a0a 100%)', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '600px', height: '400px', background: 'radial-gradient(ellipse, rgba(220,38,38,0.1) 0%, transparent 70%)', pointerEvents: 'none' }}></div>
-        <div style={{ maxWidth: '700px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.3rem 0.9rem', background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.3)', borderRadius: '2px', fontSize: '0.78rem', color: '#f87171', marginBottom: '1.5rem' }}>
-            Platform Features
+      <section className="bg-gradient-main" style={{ padding: '6rem 1.5rem 4rem', textAlign: 'center', borderBottom: '1px solid #1c1e2e', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+          <div style={{ fontSize: '0.8rem', color: '#ff2a75', fontWeight: '700', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+            CORE CAPABILITIES
           </div>
-          <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: '700', color: '#f0f0f0', marginBottom: '1.25rem', lineHeight: '1.12', letterSpacing: '-0.025em' }}>
-            Everything you need to <span style={{ color: '#dc2626' }}>hire smarter</span>
+          <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: '800', color: '#ffffff', marginBottom: '1.5rem', lineHeight: '1.1', letterSpacing: '-0.02em' }}>
+            EVERYTHING YOU NEED<br />TO <span style={{ color: '#2a5bff' }}>HIRE SMARTER</span>
           </h1>
-          <p style={{ fontSize: '1.05rem', color: '#666', lineHeight: '1.75', maxWidth: '560px', margin: '0 auto 2rem' }}>
+          <p style={{ fontSize: '1.1rem', color: '#a0a5b5', lineHeight: '1.7', maxWidth: '600px', margin: '0 auto 2rem', fontWeight: '400' }}>
             AI Recruiter is packed with powerful, rule-based tools that eliminate bias and automate the most time-consuming parts of technical hiring.
           </p>
         </div>
       </section>
 
       {/* Core Feature Grid */}
-      <section style={{ padding: '5rem 1.5rem', background: '#0a0a0a' }}>
+      <section style={{ padding: '6rem 1.5rem', background: '#090a0f' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: '700', color: '#f0f0f0', marginBottom: '0.5rem' }}>Core Capabilities</h2>
-          <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '2.5rem' }}>A complete recruiting engine — from resume intake to final shortlist.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
             {[
-              { icon: <FileText size={22} color="#dc2626" />, title: 'Smart Resume Parsing', desc: 'Upload any PDF resume. Our system instantly extracts candidate name, email, skills, experience, and GitHub/LinkedIn links — no manual data entry required.' },
-              { icon: <Github size={22} color="#dc2626" />, title: 'Live GitHub Audit', desc: 'We query the GitHub API in real time to verify claimed programming languages, repository quality, commit frequency, and open-source contributions.' },
-              { icon: <ShieldCheck size={22} color="#dc2626" />, title: 'Anti-Cheat Proctoring', desc: 'Fullscreen enforcement, tab-switch detection, copy/paste blocking, and DevTools monitoring ensure assessments reflect the candidate\'s true skill level.' },
-              { icon: <BrainCircuit size={22} color="#dc2626" />, title: 'Domain-Specific MCQ Tests', desc: 'Candidates are automatically assigned tests in their declared domain: Frontend, Backend, DevOps, ML/AI, Mobile, or General CS — with randomised questions each time.' },
-              { icon: <Zap size={22} color="#dc2626" />, title: 'Algorithmic Scoring Engine', desc: 'A transparent, weighted formula combines resume keyword scores (30%), GitHub metrics (30%), and test performance (40%) into one final hiring score.' },
-              { icon: <BarChart2 size={22} color="#dc2626" />, title: 'Recruiter Dashboard', desc: 'A real-time dashboard lets recruiters view all candidates, filter by domain or status, read score breakdowns, add notes, and update hiring decisions.' },
-              { icon: <Lock size={22} color="#dc2626" />, title: 'Secure Auth & JWT', desc: 'Candidate and recruiter sessions are protected with bcrypt-hashed passwords and short-lived JSON Web Tokens — no third-party auth dependencies.' },
-              { icon: <Activity size={22} color="#dc2626" />, title: 'Cheat Strike Logging', desc: 'Every anti-cheat violation is timestamped and stored per candidate. Recruiters can review the full cheat log alongside each candidate\'s test score.' },
-              { icon: <Globe size={22} color="#dc2626" />, title: 'Cloud-Ready Deployment', desc: 'Built as a single unified service deployable to Render, Railway, or any Node.js-compatible cloud platform with PostgreSQL support. Zero Docker required.' },
+              { icon: <FileText size={24} color="#ff2a75" />, title: 'Smart Resume Parsing', desc: 'Upload any PDF resume. Our system instantly extracts candidate name, email, skills, experience, and GitHub/LinkedIn links — no manual data entry required.' },
+              { icon: <Github size={24} color="#2a5bff" />, title: 'Live GitHub Audit', desc: 'We query the GitHub API in real time to verify claimed programming languages, repository quality, commit frequency, and open-source contributions.' },
+              { icon: <ShieldCheck size={24} color="#2ecc71" />, title: 'Anti-Cheat Proctoring', desc: 'Fullscreen enforcement, tab-switch detection, copy/paste blocking, and DevTools monitoring ensure assessments reflect the candidate\'s true skill level.' },
+              { icon: <BrainCircuit size={24} color="#9b59b6" />, title: 'Domain-Specific Tests', desc: 'Candidates are automatically assigned tests in their declared domain: Frontend, Backend, DevOps, ML/AI, Mobile, or General CS — with randomised questions each time.' },
+              { icon: <Zap size={24} color="#e67e22" />, title: 'Algorithmic Scoring Engine', desc: 'A transparent, weighted formula combines resume keyword scores (30%), GitHub metrics (30%), and test performance (40%) into one final hiring score.' },
+              { icon: <BarChart2 size={24} color="#ff2a75" />, title: 'Recruiter Dashboard', desc: 'A real-time dashboard lets recruiters view all candidates, filter by domain or status, read score breakdowns, add notes, and update hiring decisions.' },
             ].map((f, i) => (
               <div key={i} className="feature-card">
-                <div style={{ width: '42px', height: '42px', background: 'rgba(220,38,38,0.1)', border: '1px solid rgba(220,38,38,0.2)', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.1rem' }}>{f.icon}</div>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: '600', color: '#f0f0f0', marginBottom: '0.5rem' }}>{f.title}</h3>
-                <p style={{ fontSize: '0.83rem', color: '#666', lineHeight: '1.65' }}>{f.desc}</p>
+                <div style={{ width: '50px', height: '50px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>{f.icon}</div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#ffffff', marginBottom: '0.75rem' }}>{f.title}</h3>
+                <p style={{ fontSize: '0.9rem', color: '#a0a5b5', lineHeight: '1.7' }}>{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Comparison Table */}
-      <section style={{ padding: '5rem 1.5rem', background: '#0d0d0d', borderTop: '1px solid #1a1a1a' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '1.4rem', fontWeight: '700', color: '#f0f0f0', marginBottom: '0.5rem', textAlign: 'center' }}>AI Recruiter vs. Traditional Hiring</h2>
-          <p style={{ fontSize: '0.9rem', color: '#555', textAlign: 'center', marginBottom: '2.5rem' }}>See exactly what you gain by switching from manual screening.</p>
-          <div style={{ border: '1px solid #1e1e1e', borderRadius: '4px', overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', background: '#161616', borderBottom: '1px solid #1e1e1e' }}>
-              <div style={{ padding: '0.85rem 1.25rem', fontSize: '0.8rem', fontWeight: '600', color: '#777', textTransform: 'uppercase' }}>Feature</div>
-              <div style={{ padding: '0.85rem 1.25rem', fontSize: '0.8rem', fontWeight: '600', color: '#dc2626', textTransform: 'uppercase', textAlign: 'center' }}>AI Recruiter</div>
-              <div style={{ padding: '0.85rem 1.25rem', fontSize: '0.8rem', fontWeight: '600', color: '#555', textTransform: 'uppercase', textAlign: 'center' }}>Manual Hiring</div>
-            </div>
-            {[
-              ['Resume Verification', '✓ Automated via GitHub', '✗ Trust-based only'],
-              ['Anti-Cheat Testing', '✓ Real-time proctoring', '✗ No monitoring'],
-              ['Scoring Transparency', '✓ Rule-based, auditable', '✗ Subjective opinion'],
-              ['Time to Shortlist', '✓ Under 10 minutes', '✗ Days to weeks'],
-              ['LLM Hallucination Risk', '✓ Zero — no LLMs used', '✗ High if using AI tools'],
-              ['Cost per Candidate', '✓ Near zero (automated)', '✗ Hours of recruiter time'],
-            ].map(([feature, ai, manual], i) => (
-              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', borderBottom: i < 5 ? '1px solid #1a1a1a' : 'none', background: i % 2 === 0 ? '#0f0f0f' : '#0a0a0a' }}>
-                <div style={{ padding: '0.85rem 1.25rem', fontSize: '0.83rem', color: '#aaa' }}>{feature}</div>
-                <div style={{ padding: '0.85rem 1.25rem', fontSize: '0.83rem', color: '#4ade80', textAlign: 'center' }}>{ai}</div>
-                <div style={{ padding: '0.85rem 1.25rem', fontSize: '0.83rem', color: '#555', textAlign: 'center' }}>{manual}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section style={{ padding: '4rem 1.5rem', background: '#dc2626', textAlign: 'center' }}>
-        <h2 style={{ fontSize: '1.8rem', fontWeight: '700', color: 'white', marginBottom: '0.75rem' }}>Ready to experience these features?</h2>
-        <p style={{ color: 'rgba(255,255,255,0.75)', marginBottom: '2rem', fontSize: '0.95rem' }}>Sign up free and run your first candidate screening in minutes.</p>
-        <button style={{ background: 'white', color: '#dc2626', border: 'none', padding: '0.75rem 2rem', fontSize: '0.95rem', fontWeight: '600', cursor: 'pointer', borderRadius: '2px', transition: 'all 0.15s' }} onClick={() => router.push('/apply')}>
-          Get started free →
-        </button>
       </section>
 
       {/* Footer */}
-      <footer style={{ background: '#080808', borderTop: '1px solid #1a1a1a', padding: '2rem 1.5rem', textAlign: 'center' }}>
-        <p style={{ fontSize: '0.78rem', color: '#444' }}>© {new Date().getFullYear()} Zingo. All rights reserved.</p>
+      <footer style={{ background: '#050608', borderTop: '1px solid #1c1e2e', padding: '3rem 1.5rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 20, height: 20, borderRadius: '50%', background: 'linear-gradient(45deg, #2a5bff, #ff2a75)' }}></div>
+              <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #a0a5b5', marginLeft: '-6px' }}></div>
+            </div>
+            <span style={{ color: '#ffffff', fontWeight: '700', fontSize: '1rem', letterSpacing: '0.5px' }}>ZINGORECRUIT</span>
+          </div>
+          <p style={{ fontSize: '0.85rem', color: '#6a6d82' }}>© {new Date().getFullYear()} Zingo. All rights reserved.</p>
+        </div>
       </footer>
     </div>
   );
