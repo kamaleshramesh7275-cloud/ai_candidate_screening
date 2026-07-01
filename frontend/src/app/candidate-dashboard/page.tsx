@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -787,13 +787,20 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
   const [questions, setQuestions] = useState<any[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60); 
+  const [timeLeft, setTimeLeft] = useState(120); 
   const [started, setStarted] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Anti-Cheat State
   const [strikes, setStrikes] = useState(0);
   const [cheatLog, setCheatLog] = useState<{type: string, timestamp: string}[]>([]);
+
+  // Replay & Video State
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const videoChunksRef = useRef<Blob[]>([]);
+  const codeReplayRef = useRef<{ time: number; code: string; questionId: string }[]>([]);
+  const testStartTimeRef = useRef<number>(0);
 
   const domain = candidate.domain || 'General CS';
   const candidateId = candidate.id;
@@ -817,6 +824,24 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
       document.exitFullscreen().catch(()=>{});
     }
 
+    // Stop recording and process video
+    let videoBase64 = null;
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      // Wait briefly for ondataavailable to trigger
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    if (videoChunksRef.current.length > 0) {
+      const blob = new Blob(videoChunksRef.current, { type: 'video/webm' });
+      videoBase64 = await new Promise<string | null>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+      });
+    }
+
     try {
       const res = await fetch(`${API_BASE}/api/test/submit`, {
         method: 'POST',
@@ -825,7 +850,9 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
           candidateId,
           answers,
           cheatStrikes: finalStrikes,
-          cheatLog
+          cheatLog,
+          codeReplayData: codeReplayRef.current,
+          videoRecording: videoBase64
         })
       });
 
@@ -904,7 +931,7 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
   const handleNext = useCallback(() => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
-      setTimeLeft(60);
+      setTimeLeft(120);
     } else {
       handleSubmitTest(strikes);
     }
@@ -921,11 +948,46 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
 
   const startTest = async () => {
     try {
+      // 1. Request Camera
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      
+      // 2. Setup Recording
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          videoChunksRef.current.push(event.data);
+        }
+      };
+      mediaRecorder.start(1000); // chunk every second
+      mediaRecorderRef.current = mediaRecorder;
+
+      // 3. Setup Video element
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+
+      // 4. Request Fullscreen
       await document.documentElement.requestFullscreen();
+      
+      testStartTimeRef.current = Date.now();
+      setStarted(true);
     } catch (err) {
-      console.warn("Fullscreen request denied", err);
+      console.warn("Test setup failed", err);
+      alert("Camera permissions are required to start the test. Please allow camera access and try again.");
     }
-    setStarted(true);
+  };
+
+  const handleCodeChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const code = e.target.value;
+    const currentQ = questions[currentQuestionIndex];
+    setAnswers(prev => ({ ...prev, [currentQ.id]: code }));
+    
+    // Log keystroke snapshot
+    codeReplayRef.current.push({
+      time: Date.now() - testStartTimeRef.current,
+      code,
+      questionId: currentQ.id
+    });
   };
 
   if (loading) return (
@@ -951,7 +1013,7 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-700 dark:text-slate-350">
             <div className="flex items-start gap-3 p-3.5 bg-white/5 rounded-xl border border-slate-150 dark:border-slate-800/80">
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-              <p className="text-xs">Do not switch tabs, minimize window or navigate away.</p>
+              <p className="text-xs">Camera access is compulsory. Ensure your face is visible.</p>
             </div>
             <div className="flex items-start gap-3 p-3.5 bg-white/5 rounded-xl border border-slate-150 dark:border-slate-800/80">
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
@@ -967,9 +1029,9 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="bg-slate-50/50 dark:bg-slate-950/20 pt-6 rounded-b-xl border-t border-slate-100 dark:border-slate-850/50">
+        <CardFooter className="bg-slate-50/50 dark:bg-slate-950/20 pt-6 rounded-b-xl border-t border-slate-100 dark:border-slate-850/50 flex flex-col gap-4">
           <Button onClick={startTest} size="lg" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold h-12 rounded-xl transition-all shadow-md shadow-indigo-500/20">
-            Accept &amp; Enter Fullscreen Environment
+            Allow Camera &amp; Enter Fullscreen Environment
           </Button>
         </CardFooter>
       </Card>
@@ -987,8 +1049,7 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
   }
 
   return (
-    <div className="w-full space-y-6">
-      
+    <div className="w-full space-y-4">
       {/* HUD Timer and Strikes stats */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-white/10">
         <div className="flex items-center gap-4 w-full sm:w-auto">
@@ -1023,45 +1084,61 @@ function AssessmentFlow({ candidate, onSuccess }: AssessmentProps) {
         </div>
       </div>
       
-      {/* Question Card */}
-      <Card className="border-0 shadow-lg overflow-hidden bg-white dark:bg-slate-900 border border-white/10">
-        <CardHeader className="bg-slate-50/50 dark:bg-slate-950/20 p-6 border-b border-slate-100 dark:border-slate-850/50">
-          <CardTitle className="text-xl font-bold text-slate-850 dark:text-white leading-normal">
-            {currentQ.question}
-          </CardTitle>
-        </CardHeader>
-        
-        <CardContent className="p-6 space-y-3.5">
-          {currentQ.options.map((option: string) => (
-            <div 
-              key={option}
-              onClick={() => setAnswers({...answers, [currentQ.id]: option})}
-              className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between group ${
-                answers[currentQ.id] === option 
-                  ? 'border-indigo-650 bg-indigo-50/50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 shadow-sm' 
-                  : 'border-slate-150 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-350 hover:border-indigo-300 dark:hover:border-slate-700 hover:shadow-md'
-              }`}
-            >
-              <span className="text-sm font-semibold leading-relaxed">
-                {option}
-              </span>
-              {answers[currentQ.id] === option && (
-                <CheckCircle2 className="w-5 h-5 text-indigo-650 dark:text-indigo-400" />
-              )}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Main Question & Editor Area */}
+        <div className="md:col-span-3">
+          <Card className="border-0 shadow-lg overflow-hidden bg-white dark:bg-slate-900 border border-white/10 h-full flex flex-col">
+            <CardHeader className="bg-slate-50/50 dark:bg-slate-950/20 p-5 border-b border-slate-100 dark:border-slate-850/50">
+              <CardTitle className="text-lg font-bold text-slate-850 dark:text-white leading-normal">
+                {currentQ.question}
+              </CardTitle>
+            </CardHeader>
+            
+            <CardContent className="p-0 flex-1 relative min-h-[300px]">
+              <textarea 
+                className="w-full h-full min-h-[400px] p-6 bg-slate-950 text-emerald-400 font-mono text-sm focus:outline-none resize-none"
+                placeholder="// Write your code solution here..."
+                value={answers[currentQ.id] || ''}
+                onChange={handleCodeChange}
+                spellCheck={false}
+              />
+            </CardContent>
+            
+            <CardFooter className="bg-slate-50/30 dark:bg-slate-950/10 p-5 border-t border-slate-100 dark:border-slate-850/50 flex justify-end">
+              <Button 
+                onClick={handleNext} 
+                disabled={!answers[currentQ.id]}
+                className="px-8 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 font-bold h-11 rounded-xl shadow-md transition-all"
+              >
+                {currentQuestionIndex === questions.length - 1 ? 'Submit Assessment' : 'Next Question'}
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+
+        {/* Proctor Sidebar */}
+        <div className="md:col-span-1">
+          <Card className="border-0 shadow-lg overflow-hidden bg-black border border-white/10 sticky top-4">
+            <div className="relative aspect-video bg-slate-900">
+              <video 
+                ref={videoRef} 
+                autoPlay 
+                playsInline 
+                muted 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-2 left-2 flex items-center gap-1.5 bg-black/60 px-2 py-1 rounded text-[10px] font-bold text-red-500 uppercase tracking-widest">
+                <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+                REC
+              </div>
             </div>
-          ))}
-        </CardContent>
-        
-        <CardFooter className="bg-slate-50/30 dark:bg-slate-950/10 p-6 border-t border-slate-100 dark:border-slate-850/50 flex justify-end">
-          <Button 
-            onClick={handleNext} 
-            disabled={!answers[currentQ.id]}
-            className="px-8 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-slate-900 font-bold h-11 rounded-xl shadow-md transition-all"
-          >
-            {currentQuestionIndex === questions.length - 1 ? 'Submit Assessment' : 'Next Question'}
-          </Button>
-        </CardFooter>
-      </Card>
+            <div className="p-4 bg-slate-900 border-t border-white/10 text-center">
+              <p className="text-xs text-slate-400 font-bold">Proctoring Active</p>
+              <p className="text-[10px] text-slate-500 mt-1">Live recording and keystroke analysis enabled.</p>
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

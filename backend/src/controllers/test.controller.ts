@@ -36,7 +36,7 @@ export const generateTest = async (req: Request, res: Response) => {
 
 export const submitTest = async (req: Request, res: Response) => {
   try {
-    const { candidateId, answers, cheatStrikes, cheatLog } = req.body;
+    const { candidateId, answers, cheatStrikes, cheatLog, codeReplayData, videoRecording } = req.body;
 
     const candidate = await prisma.candidate.findUnique({
       where: { id: candidateId }
@@ -100,6 +100,8 @@ export const submitTest = async (req: Request, res: Response) => {
         testScore,
         cheatStrikes: finalCheatStrikes,
         cheatLog: JSON.stringify(updatedCheatLog),
+        codeReplayData: codeReplayData ? JSON.stringify(codeReplayData) : null,
+        videoRecording,
         overallScore,
         status: 'Tested'
       }

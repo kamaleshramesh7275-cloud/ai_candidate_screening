@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Activity, Github, Linkedin, StickyNote, CheckCircle2, TrendingUp } from 'lucide-react';
+import { Activity, Github, Linkedin, StickyNote, CheckCircle2, TrendingUp, Video } from 'lucide-react';
 import { API_BASE } from '@/lib/api';
+import { SessionReplayViewer } from '@/components/SessionReplayViewer';
 
 const DOMAIN_KEYWORDS: Record<string, string[]> = {
   Frontend: ['React', 'Next.js', 'JavaScript', 'TypeScript', 'CSS', 'HTML', 'Tailwind', 'Redux', 'Vue', 'Angular', 'Webpack', 'GraphQL', 'REST', 'npm', 'Vite'],
@@ -49,6 +50,7 @@ interface CandidateDialogProps {
 export function CandidateDialog({ candidate, isOpen, onClose, onNotesSaved }: CandidateDialogProps) {
   const [notes, setNotes] = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
+  const [isReplayOpen, setIsReplayOpen] = useState(false);
 
   useEffect(() => {
     if (candidate) {
@@ -90,6 +92,17 @@ export function CandidateDialog({ candidate, isOpen, onClose, onNotesSaved }: Ca
             <Badge variant="outline" className="font-normal text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800">
               {candidate.domain || 'Unspecified'}
             </Badge>
+            {candidate.videoRecording && candidate.codeReplayData && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="ml-auto bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900"
+                onClick={() => setIsReplayOpen(true)}
+              >
+                <Video className="w-4 h-4 mr-2" />
+                View Session Replay
+              </Button>
+            )}
           </DialogTitle>
           <DialogDescription className="text-zinc-500 dark:text-zinc-400">{candidate.email}</DialogDescription>
         </DialogHeader>
@@ -376,6 +389,16 @@ export function CandidateDialog({ candidate, isOpen, onClose, onNotesSaved }: Ca
           </div>
         </div>
       </DialogContent>
+      
+      {candidate && (
+        <SessionReplayViewer 
+          isOpen={isReplayOpen} 
+          onClose={() => setIsReplayOpen(false)} 
+          candidateName={candidate.name}
+          codeReplayData={candidate.codeReplayData}
+          videoRecording={candidate.videoRecording}
+        />
+      )}
     </Dialog>
   );
 }

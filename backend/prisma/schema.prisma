@@ -31,6 +31,8 @@ model Candidate {
   testStartTime   DateTime?
   cheatStrikes    Int      @default(0)
   cheatLog        String?  // Storing JSON as string
+  codeReplayData  String?  // Storing JSON array as string
+  videoRecording  String?  // Storing base64 webm video
   
   // Recruiter Notes
   recruiterNotes  String?
