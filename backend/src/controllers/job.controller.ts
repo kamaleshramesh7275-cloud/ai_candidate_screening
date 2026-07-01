@@ -37,7 +37,7 @@ export const getJobsForRecruiter = async (req: Request, res: Response) => {
     }
 
     const jobs = await prisma.job.findMany({
-      where: { recruiterId },
+      where: { recruiterId: recruiterId as string },
       orderBy: { createdAt: 'desc' },
     });
 

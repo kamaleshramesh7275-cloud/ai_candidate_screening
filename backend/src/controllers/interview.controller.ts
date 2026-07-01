@@ -39,7 +39,7 @@ export const getCandidateInterviews = async (req: Request, res: Response) => {
     }
 
     const interviews = await prisma.interview.findMany({
-      where: { candidateId },
+      where: { candidateId: candidateId as string },
       include: {
         job: true,
       },
@@ -64,7 +64,7 @@ export const getRecruiterInterviews = async (req: Request, res: Response) => {
     const interviews = await prisma.interview.findMany({
       where: {
         job: {
-          recruiterId
+          recruiterId: recruiterId as string
         }
       },
       include: {
