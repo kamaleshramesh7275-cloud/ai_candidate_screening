@@ -141,6 +141,6 @@
   }
   .glow-border::before {
     content: '';
-    @apply absolute inset-0 -z-10 rounded-inherit m-[-1px] bg-gradient-to-r from-ai-violet to-ai-cyan opacity-30;
+    @apply absolute inset-0 -z-10 rounded-[inherit] m-[-1px] bg-gradient-to-r from-ai-violet to-ai-cyan opacity-30;
   }
 }
