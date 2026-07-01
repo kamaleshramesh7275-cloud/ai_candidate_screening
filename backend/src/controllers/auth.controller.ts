@@ -1,15 +1,121 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecretrecruiterjwttokenkey';
+
+// ── RECRUITER AUTH ──────────────────────────────────────────────────────────
+
+export const recruiterRegister = async (req: Request, res: Response): Promise<void> => {
+  const { name, email, password, company } = req.body;
+  if (!name || !email || !password) {
+    res.status(400).json({ error: 'Name, email and password are required' });
+    return;
+  }
+
+  try {
+    const existing = await prisma.recruiter.findUnique({ where: { email } });
+    if (existing) {
+      res.status(409).json({ error: 'An account with this email already exists' });
+      return;
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+    const recruiter = await prisma.recruiter.create({
+      data: { name, email, password: hashed },
+    });
+
+    const token = jwt.sign({ id: recruiter.id, role: 'recruiter' }, JWT_SECRET, { expiresIn: '7d' });
+    res.status(201).json({ token, id: recruiter.id, name: recruiter.name, email: recruiter.email, role: 'recruiter' });
+  } catch (err) {
+    console.error('Recruiter register error:', err);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+};
 
 export const recruiterLogin = async (req: Request, res: Response): Promise<void> => {
-  const { password } = req.body;
-  const expectedPassword = process.env.RECRUITER_PASSWORD || 'admin';
-  const jwtSecret = process.env.JWT_SECRET || 'supersecretrecruiterjwttokenkey';
+  const { email, password } = req.body;
+  if (!email || !password) {
+    res.status(400).json({ error: 'Email and password are required' });
+    return;
+  }
 
-  if (password === expectedPassword) {
-    const token = jwt.sign({ role: 'recruiter' }, jwtSecret, { expiresIn: '1d' });
-    res.json({ success: true, token });
-  } else {
-    res.status(401).json({ success: false, message: 'Invalid password' });
+  try {
+    const recruiter = await prisma.recruiter.findUnique({ where: { email } });
+    if (!recruiter) {
+      res.status(401).json({ error: 'Invalid email or password' });
+      return;
+    }
+
+    const valid = await bcrypt.compare(password, recruiter.password);
+    if (!valid) {
+      res.status(401).json({ error: 'Invalid email or password' });
+      return;
+    }
+
+    const token = jwt.sign({ id: recruiter.id, role: 'recruiter' }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, id: recruiter.id, name: recruiter.name, email: recruiter.email, role: 'recruiter' });
+  } catch (err) {
+    console.error('Recruiter login error:', err);
+    res.status(500).json({ error: 'Login failed' });
+  }
+};
+
+// ── CANDIDATE AUTH ──────────────────────────────────────────────────────────
+
+export const candidateRegister = async (req: Request, res: Response): Promise<void> => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) {
+    res.status(400).json({ error: 'Name, email and password are required' });
+    return;
+  }
+
+  try {
+    const existing = await prisma.candidate.findUnique({ where: { email } });
+    if (existing) {
+      res.status(409).json({ error: 'An account with this email already exists' });
+      return;
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+    const candidate = await prisma.candidate.create({
+      data: { name, email, password: hashed },
+    });
+
+    const token = jwt.sign({ id: candidate.id, role: 'candidate' }, JWT_SECRET, { expiresIn: '7d' });
+    res.status(201).json({ token, id: candidate.id, name: candidate.name, email: candidate.email, role: 'candidate' });
+  } catch (err) {
+    console.error('Candidate register error:', err);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+};
+
+export const candidateLogin = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    res.status(400).json({ error: 'Email and password are required' });
+    return;
+  }
+
+  try {
+    const candidate = await prisma.candidate.findUnique({ where: { email } });
+    if (!candidate || !candidate.password) {
+      res.status(401).json({ error: 'Invalid email or password' });
+      return;
+    }
+
+    const valid = await bcrypt.compare(password, candidate.password);
+    if (!valid) {
+      res.status(401).json({ error: 'Invalid email or password' });
+      return;
+    }
+
+    const token = jwt.sign({ id: candidate.id, role: 'candidate' }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, id: candidate.id, name: candidate.name, email: candidate.email, role: 'candidate' });
+  } catch (err) {
+    console.error('Candidate login error:', err);
+    res.status(500).json({ error: 'Login failed' });
   }
 };

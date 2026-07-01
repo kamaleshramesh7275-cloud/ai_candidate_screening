@@ -11,6 +11,7 @@ model Candidate {
   id              String   @id @default(uuid())
   name            String
   email           String   @unique
+  password        String?  // Hashed - optional for backwards compat with intake flow
   linkedInUrl     String?
   githubUrl       String?
   resumeText      String?

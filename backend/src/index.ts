@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { handleIntake } from './controllers/intake.controller';
-import { recruiterLogin } from './controllers/auth.controller';
+import { recruiterLogin, recruiterRegister, candidateLogin, candidateRegister } from './controllers/auth.controller';
 
 dotenv.config();
 
@@ -49,7 +49,12 @@ app.get('/api/test/generate/:domain', generateTest);
 app.post('/api/test/submit', submitTest);
 
 // Recruiter Auth
+app.post('/api/recruiter/register', recruiterRegister);
 app.post('/api/recruiter/login', recruiterLogin);
+
+// Candidate Auth
+app.post('/api/candidate/register', candidateRegister);
+app.post('/api/candidate/login', candidateLogin);
 
 // Protected Recruiter Routes
 app.get('/api/recruiter/candidates', authenticateRecruiter, getCandidates);

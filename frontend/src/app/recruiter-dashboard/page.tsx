@@ -80,16 +80,16 @@ export default function RecruiterDashboard() {
       document.documentElement.classList.add('dark');
     }
 
-    // 2. Sync Session
-    const activeSession = localStorage.getItem('user_session');
+    // 2. Sync Session - try new key first, fall back to old
+    const activeSession = localStorage.getItem('recruiter_session') || localStorage.getItem('user_session');
     if (!activeSession) {
-      router.push('/login');
+      router.push('/login?role=recruiter');
       return;
     }
     
     const parsed = JSON.parse(activeSession);
     if (parsed.role !== 'recruiter') {
-      router.push('/login');
+      router.push('/login?role=recruiter');
       return;
     }
     

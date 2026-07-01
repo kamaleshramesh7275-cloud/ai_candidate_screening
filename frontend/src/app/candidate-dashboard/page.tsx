@@ -45,16 +45,16 @@ export default function CandidateDashboard() {
       document.documentElement.classList.add('dark');
     }
 
-    // 2. Sync Session
-    const activeSession = localStorage.getItem('user_session');
+    // 2. Sync Session - try new key first, fall back to old
+    const activeSession = localStorage.getItem('candidate_session') || localStorage.getItem('user_session');
     if (!activeSession) {
-      router.push('/login');
+      router.push('/login?role=candidate');
       return;
     }
     
     const parsed = JSON.parse(activeSession);
     if (parsed.role !== 'candidate') {
-      router.push('/login');
+      router.push('/login?role=candidate');
       return;
     }
     

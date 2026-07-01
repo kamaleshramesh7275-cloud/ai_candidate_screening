@@ -145,8 +145,8 @@ export default function HomePage() {
 
           {/* Nav Links */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
-            <span className="nav-link" onClick={() => router.push('/apply')}>Candidates</span>
-            <span className="nav-link" onClick={() => router.push('/recruiter')}>Recruiters</span>
+            <span className="nav-link" onClick={() => router.push('/login?role=candidate')}>Candidates</span>
+            <span className="nav-link" onClick={() => router.push('/login?role=recruiter')}>Recruiters</span>
             <span className="nav-link" onClick={() => router.push('/features')}>Features</span>
             <span className="nav-link" onClick={() => router.push('/pricing')}>Pricing</span>
             <span className="nav-link" onClick={() => router.push('/about')}>About</span>
@@ -179,10 +179,10 @@ export default function HomePage() {
               Join us in revolutionizing hiring. Automate technical screening using verifiable data. Cross-reference resume claims against real GitHub activity and enforce strict anti-cheat testing.
             </p>
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button className="btn-blue" onClick={() => router.push('/apply')}>
+              <button className="btn-blue" onClick={() => router.push('/login?role=candidate')}>
                 APPLY AS CANDIDATE
               </button>
-              <button className="btn-outline" onClick={() => router.push('/recruiter')}>
+              <button className="btn-outline" onClick={() => router.push('/login?role=recruiter')}>
                 RECRUITER DASHBOARD
               </button>
             </div>
