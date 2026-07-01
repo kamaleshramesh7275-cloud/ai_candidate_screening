@@ -24,6 +24,9 @@ export default function CandidateDashboard() {
   
   // Sub-view: 'intake' | 'review' | 'test' | 'success'
   const [viewState, setViewState] = useState<'intake' | 'review' | 'test' | 'success'>('intake');
+  
+  // Post-test active tab
+  const [activeTab, setActiveTab] = useState<'scores' | 'interviews' | 'profile' | 'activity'>('scores');
 
   // Intake Form fields
   const [intakeLoading, setIntakeLoading] = useState(false);
@@ -171,10 +174,40 @@ export default function CandidateDashboard() {
           </div>
           
           <div className="flex items-center gap-4">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-              <User className="w-3.5 h-3.5" />
-              {session?.name} (Candidate)
-            </span>
+            {candidate && viewState !== 'test' && (
+              <div className="hidden md:flex items-center gap-2 mr-4 text-xs font-semibold">
+                <span className={`px-2 py-1 rounded-full ${
+                  viewState === 'intake' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400' : 'text-slate-500'
+                }`}>1. Intake</span>
+                <ArrowRight className="w-3 h-3 text-slate-300" />
+                <span className={`px-2 py-1 rounded-full ${
+                  viewState === 'review' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400' : 'text-slate-500'
+                }`}>2. Review</span>
+                <ArrowRight className="w-3 h-3 text-slate-300" />
+                <span className={`px-2 py-1 rounded-full ${
+                  viewState === 'success' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400' : 'text-slate-500'
+                }`}>3. Results</span>
+              </div>
+            )}
+
+            {candidate && candidate.status && viewState === 'success' && (
+              <span className={`hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-bold ${
+                candidate.status === 'Shortlisted' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400' :
+                candidate.status === 'Rejected' ? 'bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400' :
+                'bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400'
+              }`}>
+                {candidate.status}
+              </span>
+            )}
+
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+              <div className="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold">
+                {session?.name ? session.name.charAt(0).toUpperCase() : 'U'}
+              </div>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 hidden sm:block">
+                {session?.name}
+              </span>
+            </div>
 
             <button 
               onClick={toggleTheme}
@@ -202,7 +235,19 @@ export default function CandidateDashboard() {
         {viewState === 'intake' && (
           <Card className="w-full border-slate-250 dark:border-slate-800 shadow-xl rounded-2xl overflow-hidden bg-white dark:bg-slate-900 transition-all duration-300">
             <div className="h-1.5 w-full bg-gradient-to-r from-blue-600 to-indigo-600"></div>
-            <CardHeader className="pb-4">
+            
+            {/* Welcome Banner */}
+            <div className="bg-indigo-50/50 dark:bg-indigo-950/20 px-6 py-4 border-b border-indigo-100 dark:border-indigo-900/30 flex items-start gap-4">
+               <div className="bg-white dark:bg-slate-800 p-2 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
+                  <span className="text-2xl">👋</span>
+               </div>
+               <div>
+                 <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-300">Welcome, {session?.name}!</h3>
+                 <p className="text-sm text-indigo-700/80 dark:text-indigo-400/80 mt-0.5">Let's build your AI-verified credential profile. This should only take a minute.</p>
+               </div>
+            </div>
+
+            <CardHeader className="pb-4 pt-6">
               <CardTitle className="text-2xl font-extrabold text-white flex items-center gap-2">
                 <FileText className="w-6 h-6 text-blue-650" />
                 Talent Application Intake
@@ -282,7 +327,21 @@ export default function CandidateDashboard() {
                 </div>
 
               </CardContent>
-              <CardFooter className="bg-slate-50/50 dark:bg-slate-950/20 pt-4 px-6 pb-6 mt-4">
+
+              {/* Tips Panel */}
+              <div className="px-6 py-4 mx-6 mt-2 mb-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700">
+                <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2 mb-2">
+                  <Zap className="w-4 h-4 text-amber-500" />
+                  What happens next?
+                </h4>
+                <ul className="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 list-disc list-inside">
+                  <li>Your resume will be parsed for skills matching the selected domain.</li>
+                  <li>GitHub and LinkedIn profiles will be verified and scored.</li>
+                  <li>If eligible, you'll be invited to a short proctored assessment.</li>
+                </ul>
+              </div>
+
+              <CardFooter className="bg-slate-50/50 dark:bg-slate-950/20 pt-4 px-6 pb-6 mt-4 border-t border-slate-100 dark:border-slate-800/50">
                 <Button 
                   type="submit" 
                   disabled={intakeLoading || !formData.domain}
@@ -313,55 +372,146 @@ export default function CandidateDashboard() {
               </p>
             </div>
 
-            {/* Score Grid */}
+            {/* Score Grid - Animated Rings */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* Resume Score Ring */}
+              <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md flex flex-col items-center p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <div className="w-28 h-28 relative mb-4">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-slate-100 dark:text-slate-800" />
+                    <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-blue-500 transition-all duration-1000 ease-out" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * (candidate.resumeScore || 0)) / 100} strokeLinecap="round" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center flex-col">
+                    <span className="text-2xl font-black text-slate-800 dark:text-white">{candidate.resumeScore?.toFixed(0) || '0'}%</span>
+                  </div>
+                </div>
+                <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2 uppercase tracking-wide text-sm">
+                  <FileText className="w-4 h-4 text-blue-500" /> Resume Score
+                </h3>
+                <p className="text-xs text-center text-slate-500 mt-2 leading-relaxed">Domain keywords and structural analysis verified.</p>
+              </Card>
+
+              {/* GitHub Score Ring */}
+              <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md flex flex-col items-center p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <div className="w-28 h-28 relative mb-4">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-slate-100 dark:text-slate-800" />
+                    <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-purple-500 transition-all duration-1000 ease-out" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * (candidate.githubScore || 0)) / 100} strokeLinecap="round" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center flex-col">
+                    <span className="text-2xl font-black text-slate-800 dark:text-white">{candidate.githubScore?.toFixed(0) || '0'}%</span>
+                  </div>
+                </div>
+                <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2 uppercase tracking-wide text-sm">
+                  <Github className="w-4 h-4 text-purple-500" /> GitHub Score
+                </h3>
+                <p className="text-xs text-center text-slate-500 mt-2 leading-relaxed">Based on repository activity and contribution graph.</p>
+              </Card>
+
+              {/* LinkedIn Score Ring */}
+              <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md flex flex-col items-center p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                <div className="w-28 h-28 relative mb-4">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-slate-100 dark:text-slate-800" />
+                    <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="8" fill="none" className="text-indigo-500 transition-all duration-1000 ease-out" strokeDasharray="251.2" strokeDashoffset={251.2 - (251.2 * (candidate.linkedInScore || 0)) / 100} strokeLinecap="round" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center flex-col">
+                    <span className="text-2xl font-black text-slate-800 dark:text-white">{candidate.linkedInScore?.toFixed(0) || '0'}%</span>
+                  </div>
+                </div>
+                <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2 uppercase tracking-wide text-sm">
+                  <Linkedin className="w-4 h-4 text-indigo-500" /> LinkedIn Score
+                </h3>
+                <p className="text-xs text-center text-slate-500 mt-2 leading-relaxed">Professional history and connections indexed.</p>
+              </Card>
+            </div>
+
+            {/* Skills Matrix and Data Breakdowns */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-4">
+              
+              {/* Skills Matrix */}
               <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Resume Score</span>
-                    <FileText className="w-4.5 h-4.5 text-blue-500" />
+                <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800/50">
+                  <CardTitle className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-emerald-500" /> Skills Matrix
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-2">
-                  <div className="text-4xl font-black text-white">{candidate.resumeScore?.toFixed(1) || '0.0'}</div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-850 h-2 rounded-full mt-3 overflow-hidden">
-                    <div className="h-full bg-blue-500" style={{ width: `${candidate.resumeScore || 0}%` }}></div>
+                <CardContent className="pt-4">
+                  <div className="flex flex-wrap gap-2">
+                    {candidate.skillsMatchLog ? (
+                      (() => {
+                        try {
+                          const skills = JSON.parse(candidate.skillsMatchLog);
+                          return Object.entries(skills).map(([skill, found]: any) => (
+                            <div key={skill} className={`px-3 py-1.5 rounded-lg text-xs font-bold border flex items-center gap-1.5 ${
+                              found 
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' 
+                                : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                            }`}>
+                              {found ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5 opacity-50" />}
+                              {skill}
+                            </div>
+                          ));
+                        } catch(e) {
+                          return <p className="text-sm text-slate-500">Skills data unavailable.</p>;
+                        }
+                      })()
+                    ) : (
+                      <p className="text-sm text-slate-500">Processing skills matrix...</p>
+                    )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">Keywords parsed and indexed for role: {candidate.domain}.</p>
                 </CardContent>
               </Card>
 
+              {/* GitHub Breakdown */}
               <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-455 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>GitHub Score</span>
-                    <Github className="w-4.5 h-4.5 text-purple-500" />
+                <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800/50">
+                  <CardTitle className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-purple-500" /> GitHub Activity Insights
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-2">
-                  <div className="text-4xl font-black text-white">{candidate.githubScore?.toFixed(1) || '0.0'}</div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-850 h-2 rounded-full mt-3 overflow-hidden">
-                    <div className="h-full bg-purple-500" style={{ width: `${candidate.githubScore || 0}%` }}></div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">Calculated from stars, repo count, and push activities.</p>
+                <CardContent className="pt-4">
+                   {candidate.githubRawData ? (
+                      (() => {
+                        try {
+                          const data = JSON.parse(candidate.githubRawData);
+                          return (
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700 text-center">
+                                <div className="text-2xl font-black text-slate-800 dark:text-white">{data.public_repos || 0}</div>
+                                <div className="text-[10px] uppercase font-bold text-slate-500 mt-1">Public Repos</div>
+                              </div>
+                              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700 text-center">
+                                <div className="text-2xl font-black text-slate-800 dark:text-white">{data.followers || 0}</div>
+                                <div className="text-[10px] uppercase font-bold text-slate-500 mt-1">Followers</div>
+                              </div>
+                              {data.topLanguages && (
+                                <div className="col-span-2 mt-2">
+                                  <div className="text-xs font-bold text-slate-500 mb-2">Detected Languages:</div>
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {data.topLanguages.map((lang: string) => (
+                                      <span key={lang} className="px-2 py-0.5 bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded text-xs border border-purple-100 dark:border-purple-800">
+                                        {lang}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        } catch(e) {
+                          return <p className="text-sm text-slate-500">GitHub data unavailable.</p>;
+                        }
+                      })()
+                    ) : (
+                      <p className="text-sm text-slate-500">GitHub data not fully synced.</p>
+                    )}
                 </CardContent>
               </Card>
 
-              <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-455 dark:text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>LinkedIn Score</span>
-                    <Linkedin className="w-4.5 h-4.5 text-indigo-500" />
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <div className="text-4xl font-black text-white">{candidate.linkedInScore?.toFixed(1) || '0.0'}</div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-850 h-2 rounded-full mt-3 overflow-hidden">
-                    <div className="h-full bg-indigo-500" style={{ width: `${candidate.linkedInScore || 0}%` }}></div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">Parsed headlines and professional history indicators.</p>
-                </CardContent>
-              </Card>
             </div>
 
             {/* Test Invite Proctored Panel */}
@@ -405,85 +555,216 @@ export default function CandidateDashboard() {
           />
         )}
 
-        {/* VIEW 4: ASSESSMENT COMPLETED SUCCESS VIEW */}
+        {/* VIEW 4: ASSESSMENT COMPLETED SUCCESS VIEW (Tabbed Interface) */}
         {viewState === 'success' && candidate && (
-          <Card className="w-full max-w-xl border-white/10 shadow-2xl rounded-2xl overflow-hidden bg-white dark:bg-slate-900 transition-all duration-300">
-            <div className="h-1.5 w-full bg-emerald-500"></div>
-            <CardHeader className="text-center pb-4 pt-8">
-              <div className="mx-auto bg-emerald-50 dark:bg-emerald-950/20 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                <CheckCircle2 className="w-9 h-9 text-emerald-500" />
-              </div>
-              <CardTitle className="text-3xl font-extrabold text-white">Assessment Submitted</CardTitle>
-              <CardDescription className="text-muted-foreground mt-2 text-sm">
-                Thank you for completing the AI Recruiter assessment.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 px-6">
-              
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10/80 grid grid-cols-2 gap-4">
-                <div className="text-center border-r border-white/10">
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your Test Score</div>
-                  <div className="text-3xl font-black text-white mt-1">
-                    {candidate.testScore?.toFixed(1) || '0.0'}%
-                  </div>
+          <div className="w-full space-y-6 max-w-3xl mx-auto">
+            
+            {/* Success Hero Banner */}
+            <Card className="w-full border-white/10 shadow-2xl rounded-2xl overflow-hidden bg-white dark:bg-slate-900 transition-all duration-300">
+              <div className={`h-2 w-full ${
+                candidate.status === 'Shortlisted' ? 'bg-emerald-500' :
+                candidate.status === 'Rejected' ? 'bg-red-500' :
+                'bg-indigo-500'
+              }`}></div>
+              <CardHeader className="text-center pb-6 pt-8">
+                <div className={`mx-auto w-20 h-20 rounded-full flex items-center justify-center mb-4 ${
+                  candidate.status === 'Shortlisted' ? 'bg-emerald-50 text-emerald-500 dark:bg-emerald-950/20' :
+                  candidate.status === 'Rejected' ? 'bg-red-50 text-red-500 dark:bg-red-950/20' :
+                  'bg-indigo-50 text-indigo-500 dark:bg-indigo-950/20'
+                }`}>
+                  {candidate.status === 'Shortlisted' ? <CheckCircle2 className="w-10 h-10" /> :
+                   candidate.status === 'Rejected' ? <XCircle className="w-10 h-10" /> :
+                   <Activity className="w-10 h-10" />}
                 </div>
-                <div className="text-center">
-                  <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Overall Status</div>
-                  <div className="mt-1">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                      candidate.status === 'Shortlisted' 
-                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400' 
-                        : candidate.status === 'Rejected'
-                        ? 'bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400'
-                        : 'bg-indigo-100 text-indigo-750 dark:bg-indigo-950/50 dark:text-indigo-400'
-                    }`}>
-                      {candidate.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
+                <CardTitle className="text-4xl font-black text-slate-800 dark:text-white">
+                  {candidate.status === 'Shortlisted' ? 'You made the shortlist!' :
+                   candidate.status === 'Rejected' ? 'Application Closed' :
+                   'Assessment Under Review'}
+                </CardTitle>
+                <CardDescription className="text-slate-500 dark:text-slate-400 mt-3 text-base max-w-lg mx-auto leading-relaxed">
+                  {candidate.status === 'Shortlisted' ? 'Congratulations! Your combined profile and test scores exceed our technical bar. A recruiter will be in touch shortly.' :
+                   candidate.status === 'Rejected' ? 'Thank you for your time. Unfortunately, your technical profile did not meet the required threshold for this role.' :
+                   'Your test has been automatically graded and your profile is locked. Recruiters are currently reviewing your full technical packet.'}
+                </CardDescription>
+              </CardHeader>
+            </Card>
 
-              <div className="text-center text-xs text-slate-500 dark:text-slate-450 leading-relaxed max-w-sm mx-auto">
-                Our algorithmic evaluation metrics combine your test results, parsed resume skills, and verified GitHub contributions. Recruiters will contact you if your overall score satisfies the threshold requirements.
-              </div>
+            {/* Tabbed Navigation */}
+            <div className="flex border-b border-slate-200 dark:border-slate-800 w-full overflow-x-auto no-scrollbar">
+              <button 
+                onClick={() => setActiveTab('scores')}
+                className={`px-4 py-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors ${activeTab === 'scores' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                📊 Score Breakdown
+              </button>
+              <button 
+                onClick={() => setActiveTab('interviews')}
+                className={`px-4 py-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors flex items-center gap-2 ${activeTab === 'interviews' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                📅 Interviews {interviews.length > 0 && <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 py-0.5 px-2 rounded-full text-[10px]">{interviews.length}</span>}
+              </button>
+              <button 
+                onClick={() => setActiveTab('activity')}
+                className={`px-4 py-3 text-sm font-bold border-b-2 whitespace-nowrap transition-colors ${activeTab === 'activity' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+              >
+                📝 Application Journey
+              </button>
+            </div>
 
-            </CardContent>
-            <CardFooter className="bg-slate-50/50 dark:bg-slate-950/20 border-t border-slate-100 dark:border-slate-850/50 py-4 flex justify-center">
-              <Button onClick={() => router.push('/')} variant="outline" className="rounded-xl">
-                Return to Landing Page
-              </Button>
-            </CardFooter>
-          </Card>
-        )}
-
-        {/* INTERVIEWS SECTION - Visible if viewState is 'success' */}
-        {viewState === 'success' && candidate && (
-          <div className="w-full max-w-xl mt-8 space-y-4">
-            <h3 className="text-xl font-bold text-slate-800 dark:text-white">Your Interviews</h3>
-            {interviews.length === 0 ? (
-              <p className="text-slate-500 text-sm">No interviews scheduled yet.</p>
-            ) : (
-              <div className="space-y-4">
-                {interviews.map(interview => (
-                  <Card key={interview.id} className="border-slate-200 dark:border-slate-800">
-                    <CardHeader className="py-3 px-4 flex flex-row items-center justify-between">
-                      <div>
-                        <CardTitle className="text-md font-bold">{interview.job.title}</CardTitle>
-                        <CardDescription className="text-sm">{interview.job.companyName}</CardDescription>
+            {/* Tab Contents */}
+            
+            {activeTab === 'scores' && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md overflow-hidden">
+                  <CardHeader className="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800/50">
+                    <CardTitle className="text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-indigo-500" /> Detailed Score Report
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6 pt-6">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm font-bold">
+                        <span className="text-slate-700 dark:text-slate-300">Resume Match</span>
+                        <span className="text-blue-500">{candidate.resumeScore?.toFixed(1) || '0'}%</span>
                       </div>
-                      <span className={`px-2 py-1 text-xs rounded-full font-bold ${
-                        interview.status === 'Upcoming' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' :
-                        interview.status === 'Attended' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' :
-                        'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                      }`}>
-                        {interview.status}
-                      </span>
-                    </CardHeader>
-                    <CardContent className="py-2 px-4 border-t border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-400">
-                      Scheduled for: {new Date(interview.scheduledTime).toLocaleString()}
-                    </CardContent>
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+                        <div className="h-full bg-blue-500 rounded-full transition-all duration-1000" style={{ width: `${candidate.resumeScore || 0}%` }}></div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm font-bold">
+                        <span className="text-slate-700 dark:text-slate-300">GitHub Activity</span>
+                        <span className="text-purple-500">{candidate.githubScore?.toFixed(1) || '0'}%</span>
+                      </div>
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+                        <div className="h-full bg-purple-500 rounded-full transition-all duration-1000 delay-100" style={{ width: `${candidate.githubScore || 0}%` }}></div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm font-bold">
+                        <span className="text-slate-700 dark:text-slate-300">LinkedIn Profile</span>
+                        <span className="text-indigo-500">{candidate.linkedInScore?.toFixed(1) || '0'}%</span>
+                      </div>
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
+                        <div className="h-full bg-indigo-500 rounded-full transition-all duration-1000 delay-200" style={{ width: `${candidate.linkedInScore || 0}%` }}></div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 pt-6 mt-4 border-t border-slate-100 dark:border-slate-800 relative">
+                      <div className="flex justify-between text-base font-black">
+                        <span className="text-slate-800 dark:text-white flex items-center gap-2">
+                          Proctored Test Score
+                        </span>
+                        <span className="text-emerald-500">{candidate.testScore?.toFixed(1) || '0'}%</span>
+                      </div>
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 h-4 rounded-full overflow-hidden mt-2">
+                        <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000 delay-300" style={{ width: `${candidate.testScore || 0}%` }}></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {activeTab === 'interviews' && (
+              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                {interviews.length === 0 ? (
+                  <Card className="border-dashed border-2 border-slate-200 dark:border-slate-700 bg-transparent shadow-none text-center p-12">
+                    <Clock className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">No interviews scheduled yet.</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">If shortlisted, recruiters will schedule interviews here.</p>
                   </Card>
-                ))}
+                ) : (
+                  interviews.map(interview => {
+                    const isUpcoming = interview.status === 'Upcoming';
+                    return (
+                      <Card key={interview.id} className="border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow">
+                        <div className="flex flex-col sm:flex-row">
+                          <div className={`sm:w-32 flex flex-col justify-center items-center p-4 border-b sm:border-b-0 sm:border-r border-slate-100 dark:border-slate-800 ${
+                            isUpcoming ? 'bg-indigo-50/80 dark:bg-indigo-950/30' : 'bg-slate-50 dark:bg-slate-900/50'
+                          }`}>
+                            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                              {new Date(interview.scheduledTime).toLocaleString('default', { month: 'short' })}
+                            </span>
+                            <span className={`text-4xl font-black ${isUpcoming ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                              {new Date(interview.scheduledTime).getDate()}
+                            </span>
+                            <span className="text-xs font-bold text-slate-500 mt-1">
+                              {new Date(interview.scheduledTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <div className="p-5 flex-1 flex flex-col justify-center bg-white dark:bg-slate-900">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <h4 className="text-lg font-extrabold text-slate-800 dark:text-white leading-snug">{interview.job.title}</h4>
+                                <p className="text-sm font-medium text-slate-500">{interview.job.companyName}</p>
+                              </div>
+                              <span className={`px-2.5 py-1 text-xs rounded-full font-bold tracking-wide ${
+                                interview.status === 'Upcoming' ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400' :
+                                interview.status === 'Attended' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400' :
+                                'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                              }`}>
+                                {interview.status}
+                              </span>
+                            </div>
+                            {isUpcoming && (
+                              <div className="mt-3 bg-indigo-50 dark:bg-indigo-950/20 p-2.5 rounded-lg border border-indigo-100 dark:border-indigo-900/50 flex items-center gap-2">
+                                <Clock className="w-4 h-4 text-indigo-500" />
+                                <p className="text-xs text-indigo-700 dark:text-indigo-300 font-semibold">
+                                  Please join the meeting link 5 minutes before scheduled time.
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })
+                )}
+              </div>
+            )}
+
+            {activeTab === 'activity' && (
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <Card className="border-white/10 bg-white dark:bg-slate-900 shadow-md p-8">
+                  <div className="relative border-l-2 border-slate-200 dark:border-slate-800 ml-4 space-y-10 pb-4">
+                    
+                    <div className="relative pl-8">
+                      <div className="absolute -left-[11px] top-1 bg-emerald-500 w-5 h-5 rounded-full border-4 border-white dark:border-slate-900 flex items-center justify-center"></div>
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-white">Profile Created & Initial Intake</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">Uploaded resume and connected GitHub & LinkedIn.</p>
+                      <p className="text-[10px] uppercase font-bold text-slate-400 mt-1">{new Date(candidate.createdAt).toLocaleDateString()}</p>
+                    </div>
+
+                    <div className="relative pl-8">
+                      <div className="absolute -left-[11px] top-1 bg-emerald-500 w-5 h-5 rounded-full border-4 border-white dark:border-slate-900 flex items-center justify-center"></div>
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-white">Automated Profile Verification</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">System evaluated skills matrix and generated baseline scores.</p>
+                    </div>
+
+                    <div className="relative pl-8">
+                      <div className="absolute -left-[11px] top-1 bg-emerald-500 w-5 h-5 rounded-full border-4 border-white dark:border-slate-900 flex items-center justify-center"></div>
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-white">Proctored Assessment Completed</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">Test submitted successfully with {candidate.cheatStrikes} security flags.</p>
+                      {candidate.testStartTime && (
+                         <p className="text-[10px] uppercase font-bold text-slate-400 mt-1">{new Date(candidate.testStartTime).toLocaleDateString()}</p>
+                      )}
+                    </div>
+
+                    <div className="relative pl-8">
+                      <div className={`absolute -left-[11px] top-1 w-5 h-5 rounded-full border-4 border-white dark:border-slate-900 flex items-center justify-center ${
+                        candidate.status === 'Shortlisted' ? 'bg-emerald-500' :
+                        candidate.status === 'Rejected' ? 'bg-red-500' :
+                        'bg-indigo-500'
+                      }`}></div>
+                      <h4 className="text-sm font-bold text-slate-800 dark:text-white">Status Decision: {candidate.status}</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">Final result generated by the AI matching engine.</p>
+                    </div>
+
+                  </div>
+                </Card>
               </div>
             )}
           </div>
