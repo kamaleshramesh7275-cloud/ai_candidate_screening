@@ -15,7 +15,7 @@ services:
     plan: free
     # Run from the root so we can build both frontend and backend
     rootDir: .
-    buildCommand: cd frontend && npm install && npm run build && cd ../backend && npm install && npm run build && npx prisma migrate deploy
+    buildCommand: cd frontend && npm install --include=dev && npm run build && cd ../backend && npm install --include=dev && npm run build && npx prisma migrate deploy
     startCommand: cd backend && npm start
     envVars:
       - key: DATABASE_URL
