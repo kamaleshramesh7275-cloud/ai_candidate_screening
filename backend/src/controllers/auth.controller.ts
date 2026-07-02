@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
+import { parseResume } from '../services/resume.service';
+import { sendWelcomeEmail, sendLoginAlertEmail } from '../services/email.service';
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretrecruiterjwttokenkey';
@@ -57,6 +59,9 @@ export const recruiterRegister = async (req: Request, res: Response): Promise<vo
     const token = jwt.sign({ id: recruiter.id, role: 'recruiter', name: recruiter.name, email: recruiter.email }, JWT_SECRET, { expiresIn: '7d' });
     res.cookie('auth_token', token, COOKIE_OPTS);
     res.status(201).json({ id: recruiter.id, name: recruiter.name, email: recruiter.email, role: 'recruiter' });
+    
+    // Fire and forget welcome email
+    sendWelcomeEmail(recruiter.email, recruiter.name, 'recruiter');
   } catch (err) {
     console.error('Recruiter register error:', err);
     res.status(500).json({ error: 'Registration failed' });
@@ -86,6 +91,10 @@ export const recruiterLogin = async (req: Request, res: Response): Promise<void>
     const token = jwt.sign({ id: recruiter.id, role: 'recruiter', name: recruiter.name, email: recruiter.email }, JWT_SECRET, { expiresIn: '7d' });
     res.cookie('auth_token', token, COOKIE_OPTS);
     res.json({ id: recruiter.id, name: recruiter.name, email: recruiter.email, role: 'recruiter' });
+
+    // Fire and forget login alert
+    const ip = req.ip || req.headers['x-forwarded-for']?.toString() || 'Unknown';
+    sendLoginAlertEmail(recruiter.email, recruiter.name, 'recruiter', ip);
   } catch (err) {
     console.error('Recruiter login error:', err);
     res.status(500).json({ error: 'Login failed' });
@@ -95,7 +104,7 @@ export const recruiterLogin = async (req: Request, res: Response): Promise<void>
 // ── CANDIDATE AUTH ──────────────────────────────────────────────────────────
 
 export const candidateRegister = async (req: Request, res: Response): Promise<void> => {
-  const { name, email, password, githubUrl, linkedInUrl, resumeText } = req.body;
+  const { name, email, password, githubUrl, linkedInUrl } = req.body;
   if (!name || !email || !password) {
     res.status(400).json({ error: 'Name, email and password are required' });
     return;
@@ -106,6 +115,13 @@ export const candidateRegister = async (req: Request, res: Response): Promise<vo
     if (existing) {
       res.status(409).json({ error: 'An account with this email already exists' });
       return;
+    }
+
+    // Parse uploaded resume PDF if provided
+    let resumeText: string | null = null;
+    const resumeFile = (req as any).file as Express.Multer.File | undefined;
+    if (resumeFile?.buffer) {
+      resumeText = await parseResume(resumeFile.buffer);
     }
 
     const hashed = await bcrypt.hash(password, 10);
@@ -123,6 +139,9 @@ export const candidateRegister = async (req: Request, res: Response): Promise<vo
     const token = jwt.sign({ id: candidate.id, role: 'candidate', name: candidate.name, email: candidate.email }, JWT_SECRET, { expiresIn: '7d' });
     res.cookie('auth_token', token, COOKIE_OPTS);
     res.status(201).json({ id: candidate.id, name: candidate.name, email: candidate.email, role: 'candidate' });
+
+    // Fire and forget welcome email
+    sendWelcomeEmail(candidate.email, candidate.name, 'candidate');
   } catch (err) {
     console.error('Candidate register error:', err);
     res.status(500).json({ error: 'Registration failed' });
@@ -152,6 +171,10 @@ export const candidateLogin = async (req: Request, res: Response): Promise<void>
     const token = jwt.sign({ id: candidate.id, role: 'candidate', name: candidate.name, email: candidate.email }, JWT_SECRET, { expiresIn: '7d' });
     res.cookie('auth_token', token, COOKIE_OPTS);
     res.json({ id: candidate.id, name: candidate.name, email: candidate.email, role: 'candidate' });
+
+    // Fire and forget login alert
+    const ip = req.ip || req.headers['x-forwarded-for']?.toString() || 'Unknown';
+    sendLoginAlertEmail(candidate.email, candidate.name, 'candidate', ip);
   } catch (err) {
     console.error('Candidate login error:', err);
     res.status(500).json({ error: 'Login failed' });

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { sendNewJobEmail } from '../services/email.service';
 
 const prisma = new PrismaClient();
 
@@ -24,6 +25,10 @@ export const createJob = async (req: Request, res: Response) => {
     });
 
     res.status(201).json({ message: 'Job created successfully', job });
+
+    // Fire and forget new job notification to all candidates
+    const candidates = await prisma.candidate.findMany({ select: { name: true, email: true } });
+    sendNewJobEmail(candidates, job);
   } catch (error) {
     console.error('Error creating job:', error);
     res.status(500).json({ error: 'Failed to create job' });

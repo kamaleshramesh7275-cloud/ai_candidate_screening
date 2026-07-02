@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../index';
 import questionsDb from '../questions.json';
+import { sendTestResultEmail } from '../services/email.service';
 
 export const generateTest = async (req: Request, res: Response) => {
   try {
@@ -47,7 +48,10 @@ export const submitTest = async (req: Request, res: Response) => {
 
     const application = await prisma.jobApplication.findUnique({
       where: { id: applicationId as string },
-      include: { job: true },
+      include: { 
+        job: { include: { recruiter: true } },
+        candidate: true
+      },
     });
 
     if (!application) {
@@ -113,6 +117,22 @@ export const submitTest = async (req: Request, res: Response) => {
     });
 
     res.status(200).json({ message: 'Test submitted successfully', testScore, overallScore });
+
+    // Fire and forget test result email to recruiter
+    if (application.job.recruiter && application.candidate) {
+      sendTestResultEmail(
+        { email: application.job.recruiter.email, name: application.job.recruiter.name },
+        { name: application.candidate.name, email: application.candidate.email },
+        { title: application.job.title, companyName: application.job.companyName },
+        {
+          testScore,
+          resumeScore: application.resumeScore,
+          githubScore: application.githubScore,
+          overallScore,
+          cheatStrikes: finalCheatStrikes,
+        }
+      );
+    }
   } catch (error) {
     console.error('Error submitting test:', error);
     res.status(500).json({ error: 'Internal server error.' });
