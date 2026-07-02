@@ -155,6 +155,24 @@ app.use((_req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, '../../frontend/out/index.html'));
 });
 
+// ── CRON JOBS ─────────────────────────────────────────────────────────────────
+app.get('/api/cron/fill-scores', (req, res) => {
+  const { exec } = require('child_process');
+  const path = require('path');
+  
+  // __dirname will be backend/src, so we go up one level to reach backend/fill_random_scores.js
+  const scriptPath = path.join(__dirname, '../fill_random_scores.js');
+  
+  exec(`node ${scriptPath}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Cron Error: ${error}`);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+    console.log(`Cron Output: ${stdout}`);
+    res.status(200).json({ success: true, message: 'Scores filled successfully!', output: stdout });
+  });
+});
+
 app.listen(port, () => {
   console.log(`Backend server is running on http://localhost:${port}`);
 });
