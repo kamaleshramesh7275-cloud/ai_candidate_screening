@@ -163,7 +163,7 @@ app.get('/api/cron/fill-scores', (req, res) => {
   // __dirname will be backend/src, so we go up one level to reach backend/fill_random_scores.js
   const scriptPath = path.join(__dirname, '../fill_random_scores.js');
   
-  exec(`node ${scriptPath}`, (error, stdout, stderr) => {
+  exec(`node ${scriptPath}`, (error: Error | null, stdout: string, stderr: string) => {
     if (error) {
       console.error(`Cron Error: ${error}`);
       return res.status(500).json({ success: false, error: error.message });
