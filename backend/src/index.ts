@@ -21,6 +21,9 @@ import {
   getCandidateApplications, getApplication,
   getApplicationsForJob, updateApplicationStatus, updateApplicationNotes,
 } from './controllers/application.controller';
+import {
+  getAdminStats, getAdminCandidates, getAdminRecruiters, getAdminApplications
+} from './controllers/admin.controller';
 
 dotenv.config();
 
@@ -28,6 +31,7 @@ const app = express();
 const prisma = new PrismaClient();
 const port = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretrecruiterjwttokenkey';
+const ADMIN_SECRET = process.env.ADMIN_SECRET || 'superadmin123';
 
 // ── MIDDLEWARE ────────────────────────────────────────────────────────────────
 app.use(cors({
@@ -40,6 +44,20 @@ app.use(cookieParser());
 const upload = multer({ storage: multer.memoryStorage() });
 
 // ── AUTH MIDDLEWARE ───────────────────────────────────────────────────────────
+const authenticateAdmin = (req: Request, res: Response, next: NextFunction): void => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({ success: false, message: 'Admin access denied. No token provided.' });
+    return;
+  }
+  const token = authHeader.split(' ')[1];
+  if (token !== ADMIN_SECRET) {
+    res.status(403).json({ success: false, message: 'Invalid admin token.' });
+    return;
+  }
+  next();
+};
+
 const authenticateRecruiter = (req: Request, res: Response, next: NextFunction): void => {
   // Support both cookie and Authorization header (for backward compat)
   const token = req.cookies?.auth_token || req.headers.authorization?.split(' ')[1];
@@ -78,6 +96,12 @@ const authenticateCandidate = (req: Request, res: Response, next: NextFunction):
     res.status(403).json({ success: false, message: 'Invalid token.' });
   }
 };
+
+// ── ADMIN ROUTES ─────────────────────────────────────────────────────────────
+app.get('/api/admin/stats', authenticateAdmin, getAdminStats);
+app.get('/api/admin/candidates', authenticateAdmin, getAdminCandidates);
+app.get('/api/admin/recruiters', authenticateAdmin, getAdminRecruiters);
+app.get('/api/admin/applications', authenticateAdmin, getAdminApplications);
 
 // ── SESSION ROUTES ────────────────────────────────────────────────────────────
 app.get('/api/auth/me', getMe);

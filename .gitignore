@@ -1,6 +1,9 @@
 
 hackathon_resources/
 
+# Dev-only scripts
+backend/seed.js
+
 # Dependencies
 node_modules/
 frontend/node_modules/
