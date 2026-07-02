@@ -21,7 +21,7 @@ export default function RecruiterDashboard() {
   const [loading, setLoading] = useState(true);
   
   const [jobs, setJobs] = useState<any[]>([]);
-  const [newJob, setNewJob] = useState({ title: '', domain: 'Frontend', salary: '', description: '' });
+  const [newJob, setNewJob] = useState({ title: '', companyName: '', domain: 'Frontend', salary: '', description: '' });
   const [creatingJob, setCreatingJob] = useState(false);
   
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
@@ -43,6 +43,7 @@ export default function RecruiterDashboard() {
         return;
       }
       setSession(sess);
+      setNewJob(prev => ({ ...prev, companyName: sess.company || '' }));
       await fetchJobs(sess.id);
       setLoading(false);
     }
@@ -112,7 +113,7 @@ export default function RecruiterDashboard() {
         credentials: 'include'
       });
       if (res.ok) {
-        setNewJob({ title: '', domain: 'Frontend', salary: '', description: '' });
+        setNewJob({ title: '', companyName: session?.company || '', domain: 'Frontend', salary: '', description: '' });
         await fetchJobs(session.id);
       } else {
         alert('Failed to create job');
@@ -192,6 +193,14 @@ export default function RecruiterDashboard() {
                 <Input required value={newJob.title} onChange={e => setNewJob({...newJob, title: e.target.value})} placeholder="e.g. Senior Frontend Engineer" />
               </div>
               <div className="space-y-2">
+                <Label>Company Name</Label>
+                <Input required value={newJob.companyName} onChange={e => setNewJob({...newJob, companyName: e.target.value})} placeholder="e.g. Acme Corp" />
+              </div>
+              <div className="space-y-2">
+                <Label>Salary Range</Label>
+                <Input required value={newJob.salary} onChange={e => setNewJob({...newJob, salary: e.target.value})} placeholder="$120k - $150k" />
+              </div>
+              <div className="space-y-2">
                 <Label>Domain</Label>
                 <select required value={newJob.domain} onChange={e => setNewJob({...newJob, domain: e.target.value})} className="flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-50 dark:focus:ring-slate-400 dark:focus:ring-offset-slate-900">
                   <option value="Frontend">Frontend</option>
@@ -200,10 +209,6 @@ export default function RecruiterDashboard() {
                   <option value="ML">Machine Learning</option>
                   <option value="General CS">General CS</option>
                 </select>
-              </div>
-              <div className="space-y-2">
-                <Label>Salary Range</Label>
-                <Input required value={newJob.salary} onChange={e => setNewJob({...newJob, salary: e.target.value})} placeholder="$120k - $150k" />
               </div>
               <div className="space-y-2 md:col-span-3">
                 <Label>Description</Label>

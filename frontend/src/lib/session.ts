@@ -5,6 +5,7 @@ export interface Session {
   role: 'candidate' | 'recruiter';
   name: string;
   email: string;
+  company?: string;
 }
 
 /**

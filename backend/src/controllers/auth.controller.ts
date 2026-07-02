@@ -23,8 +23,8 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
     return;
   }
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as { id: string; role: string; name: string; email: string };
-    res.json({ id: payload.id, role: payload.role, name: payload.name, email: payload.email });
+    const payload = jwt.verify(token, JWT_SECRET) as { id: string; role: string; name: string; email: string; company?: string };
+    res.json({ id: payload.id, role: payload.role, name: payload.name, email: payload.email, company: payload.company });
   } catch {
     res.status(401).json({ error: 'Invalid or expired session' });
   }
@@ -56,7 +56,7 @@ export const recruiterRegister = async (req: Request, res: Response): Promise<vo
       data: { name, email, password: hashed, company },
     });
 
-    const token = jwt.sign({ id: recruiter.id, role: 'recruiter', name: recruiter.name, email: recruiter.email }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: recruiter.id, role: 'recruiter', name: recruiter.name, email: recruiter.email, company: recruiter.company }, JWT_SECRET, { expiresIn: '7d' });
     res.cookie('auth_token', token, COOKIE_OPTS);
     res.status(201).json({ id: recruiter.id, name: recruiter.name, email: recruiter.email, role: 'recruiter' });
     
@@ -88,7 +88,7 @@ export const recruiterLogin = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    const token = jwt.sign({ id: recruiter.id, role: 'recruiter', name: recruiter.name, email: recruiter.email }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: recruiter.id, role: 'recruiter', name: recruiter.name, email: recruiter.email, company: recruiter.company }, JWT_SECRET, { expiresIn: '7d' });
     res.cookie('auth_token', token, COOKIE_OPTS);
     res.json({ id: recruiter.id, name: recruiter.name, email: recruiter.email, role: 'recruiter' });
 
